@@ -112,7 +112,7 @@ Future<List<NotificationItem>> fetchAllNotificationsForCurrentUser() async {
         // Manager viewing requests sent to them - show sender info
         final senderInfo = await getUserInfo(senderId);
         displayName =
-            ((senderInfo?['firstName'] ?? '') + (senderInfo?['lastName'] ?? ''))
+            ((senderInfo?['firstName'] ?? '')+ " " + (senderInfo?['lastName'] ?? ''))
                 .trim();
         avatarUrl = senderInfo?['avatarUrl'] ?? '';
         debugPrint('DEBUG: Manager view - showing sender: $displayName');
@@ -216,8 +216,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Thông báo'),
+        title: const Text(
+          'Thông báo',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: const Color(0xFF0A357D),
       ),
       body: FutureBuilder<List<NotificationItem>>(
@@ -233,8 +237,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
           if (notifications.isEmpty) {
             return const Center(child: Text('Chưa có thông báo nào'));
           }
-          return ListView.builder(
+          return ListView.separated(
             itemCount: notifications.length,
+            padding: EdgeInsets.symmetric(vertical: 24),
             itemBuilder: (context, index) {
               final item = notifications[index];
               return ListTile(
@@ -266,7 +271,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   );
                 },
               );
-            },
+            }, separatorBuilder: (BuildContext context, int index) => Divider(),
           );
         },
       ),

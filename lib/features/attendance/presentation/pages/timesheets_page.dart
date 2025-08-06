@@ -17,39 +17,39 @@ class TimesheetsPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: const Color(0xFF0A357D),
         body: SafeArea(
-          child: Column(
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    const Expanded(
-                      child: Center(
-                        child: Text(
-                          'Timesheets',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Center(
+                          child: Text(
+                            'Timesheets',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.calendar_month,
-                        color: Colors.white,
-                        size: 24,
+                      IconButton(
+                        icon: const Icon(
+                          Icons.calendar_month,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                        onPressed: () {},
                       ),
-                      onPressed: () {},
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              // Content Container
-              Expanded(
-                child: Container(
+                // Content Container
+                Container(
                   margin: const EdgeInsets.only(top: 20),
                   decoration: const BoxDecoration(
                     color: Colors.white,
@@ -113,8 +113,8 @@ class TimesheetsPage extends StatelessWidget {
                     },
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -125,11 +125,11 @@ class TimesheetsPage extends StatelessWidget {
     return Column(
       children: [
         // Top section - Calendar
-        Expanded(flex: 3, child: _buildTimesheetSection(context, state)),
+        _buildTimesheetSection(context, state),
         // Divider
         Container(height: 1, color: Colors.grey.shade300),
         // Bottom section - Day details
-        Expanded(flex: 2, child: _buildDayDetailsSection(context, state)),
+        _buildDayDetailsSection(context, state),
       ],
     );
   }
@@ -177,111 +177,94 @@ class TimesheetsPage extends StatelessWidget {
 
           // Calendar
           Divider(),
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(
-                    children: [
-                      TableCalendar<AttendanceDayStatus>(
-                        firstDay: DateTime.utc(2020, 1, 1),
-                        lastDay: DateTime.utc(2030, 12, 31),
-                        focusedDay: state.selectedMonth,
-                        currentDay: DateTime.now(),
-                        calendarFormat: CalendarFormat.month,
-                        eventLoader: (day) {
-                          final status = state.dayStatusMap[day];
-                          return status != null ? [status] : [];
-                        },
-                        daysOfWeekStyle: const DaysOfWeekStyle(
-                          weekdayStyle: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          weekendStyle: TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        daysOfWeekHeight: 20,
-                        startingDayOfWeek: StartingDayOfWeek.monday,
-                        calendarStyle: const CalendarStyle(
-                          outsideDaysVisible: false,
-                          weekendTextStyle: TextStyle(color: Colors.grey),
-                          holidayTextStyle: TextStyle(color: Colors.red),
-                          defaultTextStyle: TextStyle(color: Colors.black),
-                          todayTextStyle: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          selectedTextStyle: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          todayDecoration: BoxDecoration(
-                            color: Color(0xFF00C2FF),
-                            shape: BoxShape.circle,
-                          ),
-                          selectedDecoration: BoxDecoration(
-                            color: Color(0xFF0A357D),
-                            shape: BoxShape.circle,
-                          ),
-                          markerDecoration: BoxDecoration(
-                            color: Colors.orange,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        headerStyle: const HeaderStyle(
-                          formatButtonVisible: false,
-                          titleCentered: true,
-                          leftChevronVisible: false,
-                          rightChevronVisible: false,
-                          titleTextStyle: TextStyle(fontSize: 0),
-                        ),
-                        calendarBuilders: CalendarBuilders(
-                          defaultBuilder: (context, day, focusedDay) {
-                            return _buildCalendarDay(context, day, state);
-                          },
-                          todayBuilder: (context, day, focusedDay) {
-                            return _buildCalendarDay(
-                              context,
-                              day,
-                              state,
-                              isToday: true,
-                            );
-                          },
-                          selectedBuilder: (context, day, focusedDay) {
-                            return _buildCalendarDay(
-                              context,
-                              day,
-                              state,
-                              isSelected: true,
-                            );
-                          },
-                          outsideBuilder: (context, day, focusedDay) {
-                            return Container();
-                          },
-                        ),
-                        selectedDayPredicate: (day) {
-                          return state.selectedDay != null &&
-                              _isSameDay(day, state.selectedDay!);
-                        },
-                        onDaySelected: (selectedDay, focusedDay) {
-                          context.read<TimesheetsCubit>().selectDay(
-                            selectedDay,
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      // Legend
-                      _buildLegend(),
-                      const SizedBox(height: 8),
-                    ],
-                  ),
+          TableCalendar<AttendanceDayStatus>(
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2030, 12, 31),
+            focusedDay: state.selectedMonth,
+            currentDay: DateTime.now(),
+            calendarFormat: CalendarFormat.month,
+            eventLoader: (day) {
+              final status = state.dayStatusMap[day];
+              return status != null ? [status] : [];
+            },
+            daysOfWeekStyle: const DaysOfWeekStyle(
+              weekdayStyle: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
+              weekendStyle: TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            daysOfWeekHeight: 20,
+            startingDayOfWeek: StartingDayOfWeek.monday,
+            calendarStyle: const CalendarStyle(
+              outsideDaysVisible: false,
+              weekendTextStyle: TextStyle(color: Colors.grey),
+              holidayTextStyle: TextStyle(color: Colors.red),
+              defaultTextStyle: TextStyle(color: Colors.black),
+              todayTextStyle: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              selectedTextStyle: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              todayDecoration: BoxDecoration(
+                color: Color(0xFF00C2FF),
+                shape: BoxShape.circle,
+              ),
+              selectedDecoration: BoxDecoration(
+                color: Color(0xFF0A357D),
+                shape: BoxShape.circle,
+              ),
+              markerDecoration: BoxDecoration(
+                color: Colors.orange,
+                shape: BoxShape.circle,
+              ),
+            ),
+            headerStyle: const HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+              leftChevronVisible: false,
+              rightChevronVisible: false,
+              titleTextStyle: TextStyle(fontSize: 0),
+            ),
+            calendarBuilders: CalendarBuilders(
+              defaultBuilder: (context, day, focusedDay) {
+                return _buildCalendarDay(context, day, state);
+              },
+              todayBuilder: (context, day, focusedDay) {
+                return _buildCalendarDay(
+                  context,
+                  day,
+                  state,
+                  isToday: true,
                 );
               },
+              selectedBuilder: (context, day, focusedDay) {
+                return _buildCalendarDay(
+                  context,
+                  day,
+                  state,
+                  isSelected: true,
+                );
+              },
+              outsideBuilder: (context, day, focusedDay) {
+                return Container();
+              },
             ),
+            selectedDayPredicate: (day) {
+              return state.selectedDay != null &&
+                  _isSameDay(day, state.selectedDay!);
+            },
+            onDaySelected: (selectedDay, focusedDay) {
+              context.read<TimesheetsCubit>().selectDay(
+                    selectedDay,
+                  );
+            },
           ),
         ],
       ),
@@ -352,11 +335,10 @@ class TimesheetsPage extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-
           if (dayDetails == null)
-            const Expanded(child: Center(child: CircularProgressIndicator()))
+            Center(child: CircularProgressIndicator())
           else
-            Expanded(child: _buildDayContent(dayDetails)),
+            _buildDayContent(dayDetails),
         ],
       ),
     );
@@ -775,8 +757,8 @@ class TimesheetsPage extends StatelessWidget {
           border: isSelected
               ? Border.all(color: const Color(0xFF0A357D), width: 2)
               : isToday && backgroundColor != const Color(0xFF00C2FF)
-              ? Border.all(color: const Color(0xFF00C2FF), width: 2)
-              : null,
+                  ? Border.all(color: const Color(0xFF00C2FF), width: 2)
+                  : null,
         ),
         child: Center(
           child: Text(
@@ -790,22 +772,6 @@ class TimesheetsPage extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildLegend() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _buildLegendItem(color: Colors.green.shade400, label: 'Đã duyệt'),
-        _buildLegendItem(color: Colors.orange.shade400, label: 'Đang chờ'),
-        _buildLegendItem(color: Colors.red.shade400, label: 'Từ chối'),
-        _buildLegendItem(
-          color: Colors.transparent,
-          label: 'Bình thường',
-          border: Border.all(color: Colors.grey),
-        ),
-      ],
     );
   }
 

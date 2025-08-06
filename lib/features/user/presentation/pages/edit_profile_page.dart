@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:timesheet_project/features/leave_request/presentation/pages/top_snackbar.dart';
 import 'package:timesheet_project/features/user/domain/entities/user_entity.dart';
 import 'package:timesheet_project/features/user/presentation/cubit/user_cubit.dart';
@@ -46,6 +45,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: BlocListener<UserCubit, UserState>(
         listener: (context, state) {
           if (state is UserSaved) {
@@ -59,10 +59,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
           children: [
             // Header
             _buildHeader(),
-          //  const SizedBox(height: 110),
+            //  const SizedBox(height: 110),
             // Content
             Expanded(
               child: SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.all(16),
                 child: Column(
                   children: [
                     // User Info Card
@@ -94,41 +96,33 @@ class _EditProfilePageState extends State<EditProfilePage> {
           Container(
             height: 150,
             width: double.infinity,
-            decoration: const BoxDecoration(
-              color: Color(0xFF003E83),
-            ),
-            child: Stack(
+            decoration: const BoxDecoration(color: Color(0xFF003E83)),
+            child: Row(
               children: [
-                Positioned(
-                  left: 8.0,
-                  top: 44,
-                  child: GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                        size: 24,
-                      ),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    child: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                      size: 24,
                     ),
                   ),
                 ),
                 // Title
-                const Center(
+                Expanded(
                   child: Text(
-                    'Update Information',
+                    'Cập nhật thông tin',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
+                SizedBox(width: 40)
               ],
             ),
           ),
@@ -219,10 +213,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               const SizedBox(height: 4),
               Text(
                 widget.user.role.isNotEmpty ? widget.user.role : 'Nhân viên',
-                style: const TextStyle(
-                  color: Color(0xFF6C6C81),
-                  fontSize: 14,
-                ),
+                style: const TextStyle(color: Color(0xFF6C6C81), fontSize: 14),
               ),
             ],
           ),
@@ -236,21 +227,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
       key: _formKey,
       child: Column(
         children: [
-          const SizedBox(height: 30),
+          const SizedBox(height: 12),
           _buildTextField(
             controller: _firstNameController,
-            label: 'First name',
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Vui lòng nhập tên';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-          _buildTextField(
-            controller: _lastNameController,
-            label: 'Last name',
+            label: 'Họ',
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Vui lòng nhập họ';
@@ -260,8 +240,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
           const SizedBox(height: 16),
           _buildTextField(
+            controller: _lastNameController,
+            label: 'Tên',
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Vui lòng nhập tên';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildTextField(
             controller: _phoneController,
-            label: 'Phone',
+            label: 'Số điện thoại',
             keyboardType: TextInputType.phone,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -273,7 +264,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           const SizedBox(height: 16),
           _buildTextField(
             controller: _addressController,
-            label: 'Address',
+            label: 'Địa chỉ',
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Vui lòng nhập địa chỉ';
@@ -282,15 +273,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
             },
           ),
           const SizedBox(height: 16),
-          _buildTextField(
-            controller: _roleController,
-            label: 'Role',
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Vui lòng nhập chức vụ';
-              }
-              return null;
-            },
+          IgnorePointer(
+            child: Opacity(
+              opacity: 0.65,
+              child: _buildTextField(
+                controller: _roleController,
+                label: 'Role',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Vui lòng nhập chức vụ';
+                  }
+                  return null;
+                },
+              ),
+            ),
           ),
         ],
       ),
@@ -358,7 +354,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     strokeWidth: 2,
                   )
                 : const Text(
-                    'Save',
+                    'Lưu',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,

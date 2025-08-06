@@ -8,7 +8,6 @@ import 'package:timesheet_project/features/ai_assistant/pages/question/question_
 import 'package:timesheet_project/features/ai_assistant/pages/survey/survey_cubit.dart';
 import 'package:timesheet_project/features/ai_assistant/pages/survey/survey_state.dart';
 
-
 class SurveyPage extends StatelessWidget {
   const SurveyPage({super.key});
 
@@ -16,15 +15,30 @@ class SurveyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => SurveyCubit(
-          GenerateSurvey(
-            SurveyRepositoryImpl(
-              GeminiRemoteImpl(),
+        GenerateSurvey(SurveyRepositoryImpl(GeminiRemoteImpl())),
+        SendAnswersToGemini(SurveyRepositoryImpl(GeminiRemoteImpl())),
+      )..loadSurvey(),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.white,
+              )),
+          title: const Text(
+            'Trợ lý ảo',
+            style: TextStyle(
+              fontSize: 24,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          SendAnswersToGemini(SurveyRepositoryImpl(GeminiRemoteImpl())))
-        ..loadSurvey(),
-      child: Scaffold(
-        appBar: AppBar(title: const Text('Khảo sát')),
+          backgroundColor: Color(0xFF003E83),
+        ),
         body: BlocBuilder<SurveyCubit, SurveyState>(
           builder: (context, state) {
             if (state is SurveyLoading) {
@@ -41,7 +55,9 @@ class SurveyPage extends StatelessWidget {
                       const Text(
                         'Phản hồi từ AI:',
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       Text(
@@ -52,9 +68,7 @@ class SurveyPage extends StatelessWidget {
                       Center(
                         child: ElevatedButton(
                           onPressed: () {
-                            context
-                                .read<SurveyCubit>()
-                                .loadSurvey();
+                            context.read<SurveyCubit>().loadSurvey();
                           },
                           child: const Text('Làm lại khảo sát'),
                         ),
@@ -68,6 +82,7 @@ class SurveyPage extends StatelessWidget {
               final answer = (state as dynamic).answers;
 
               return ListView.builder(
+                padding: EdgeInsets.symmetric(vertical: 12),
                 itemCount: questions.length,
                 itemBuilder: (context, index) {
                   final question = questions[index];

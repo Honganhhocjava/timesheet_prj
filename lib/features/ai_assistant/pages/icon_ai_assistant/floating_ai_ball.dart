@@ -141,7 +141,7 @@ class _FloatingAIBallState extends State<FloatingAIBall>
                 height: 60,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.blue.withValues(alpha: 0.8),
+                  color: Color(0xFF00C7F2),
                 ),
                 child: const Icon(
                   Icons.smart_toy_outlined,

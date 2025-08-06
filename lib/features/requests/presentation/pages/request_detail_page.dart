@@ -253,6 +253,9 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Request ID
+        _buildDetailRow(Icons.tag, 'Mã đơn', request.id.substring(0, 8)),
+
         if (widget.isFromSentToMe)
           _buildDetailRow(
             Icons.person,
@@ -263,53 +266,45 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
           _buildDetailRow(Icons.work, 'Người quản lý', widget.request.userName),
 
         // Start Date+
-        if (request.startDate != null)
-          _buildDetailRow(
-            Icons.calendar_today,
-            'Ngày bắt đầu',
-            DateFormat('dd/MM/yyyy').format(request.startDate!),
-          ),
+        _buildDetailRow(
+          Icons.calendar_today,
+          'Ngày bắt đầu',
+          DateFormat('dd/MM/yyyy').format(request.startDate),
+        ),
 
         // End Date
-        if (request.endDate != null)
-          _buildDetailRow(
-            Icons.calendar_today,
-            'Ngày kết thúc',
-            DateFormat('dd/MM/yyyy').format(request.endDate!),
-          ),
+        _buildDetailRow(
+          Icons.calendar_today,
+          'Ngày kết thúc',
+          DateFormat('dd/MM/yyyy').format(request.endDate),
+        ),
 
         // Start Time
-        if (request.startTime != null)
-          _buildDetailRow(
-            Icons.access_time,
-            'Giờ bắt đầu',
-            '${request.startTime!.hour.toString().padLeft(2, '0')}:${request.startTime!.minute.toString().padLeft(2, '0')}',
-          ),
+        _buildDetailRow(
+          Icons.access_time,
+          'Giờ bắt đầu',
+          '${request.startTime.hour.toString().padLeft(2, '0')}:${request.startTime.minute.toString().padLeft(2, '0')}',
+        ),
 
         // End Time
-        if (request.endTime != null)
-          _buildDetailRow(
-            Icons.access_time,
-            'Giờ kết thúc',
-            '${request.endTime!.hour.toString().padLeft(2, '0')}:${request.endTime!.minute.toString().padLeft(2, '0')}',
-          ),
+        _buildDetailRow(
+          Icons.access_time,
+          'Giờ kết thúc',
+          '${request.endTime.hour.toString().padLeft(2, '0')}:${request.endTime.minute.toString().padLeft(2, '0')}',
+        ),
 
         // Number of days
-        if (request.startDate != null && request.endDate != null)
-          _buildDetailRow(
-            Icons.date_range,
-            'Số ngày nghỉ',
-            _calculateLeaveDays(
-              request.startDate!,
-              request.endDate!,
-            ).toString(),
-          ),
+        _buildDetailRow(
+          Icons.date_range,
+          'Số ngày nghỉ',
+          _calculateLeaveDays(
+            request.startDate,
+            request.endDate,
+          ).toString(),
+        ),
 
         // Reason
         _buildDetailRow(Icons.description, 'Lý do', request.reason),
-
-        // Request ID
-        _buildDetailRow(Icons.tag, 'Mã đơn', request.id.substring(0, 8)),
       ],
     );
   }
@@ -318,6 +313,9 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Request ID
+        _buildDetailRow(Icons.tag, 'Mã đơn', request.id.substring(0, 8)),
+
         // User info - show different labels based on context
         if (widget.isFromSentToMe)
           _buildDetailRow(
@@ -329,45 +327,38 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
           _buildDetailRow(Icons.work, 'Người quản lý', widget.request.userName),
 
         // Overtime Date
-        if (request.overtimeDate != null)
-          _buildDetailRow(
-            Icons.calendar_today,
-            'Ngày làm thêm',
-            DateFormat('dd/MM/yyyy').format(request.overtimeDate!),
-          ),
+        _buildDetailRow(
+          Icons.calendar_today,
+          'Ngày làm thêm',
+          DateFormat('dd/MM/yyyy').format(request.overtimeDate),
+        ),
 
         // Start Time
-        if (request.startTime != null)
-          _buildDetailRow(
-            Icons.access_time,
-            'Giờ bắt đầu',
-            '${request.startTime!.hour.toString().padLeft(2, '0')}:${request.startTime!.minute.toString().padLeft(2, '0')}',
-          ),
+        _buildDetailRow(
+          Icons.access_time,
+          'Giờ bắt đầu',
+          '${request.startTime.hour.toString().padLeft(2, '0')}:${request.startTime.minute.toString().padLeft(2, '0')}',
+        ),
 
         // End Time
-        if (request.endTime != null)
-          _buildDetailRow(
-            Icons.access_time,
-            'Giờ kết thúc',
-            '${request.endTime!.hour.toString().padLeft(2, '0')}:${request.endTime!.minute.toString().padLeft(2, '0')}',
-          ),
+        _buildDetailRow(
+          Icons.access_time,
+          'Giờ kết thúc',
+          '${request.endTime.hour.toString().padLeft(2, '0')}:${request.endTime.minute.toString().padLeft(2, '0')}',
+        ),
 
         // Overtime Hours
-        if (request.startTime != null && request.endTime != null)
-          _buildDetailRow(
-            Icons.schedule,
-            'Số giờ làm thêm',
-            _calculateOvertimeHours(
-              request.startTime!,
-              request.endTime!,
-            ).toString(),
-          ),
+        _buildDetailRow(
+          Icons.schedule,
+          'Số giờ làm thêm',
+          _calculateOvertimeHours(
+            request.startTime,
+            request.endTime,
+          ).toString(),
+        ),
 
         // Reason
         _buildDetailRow(Icons.description, 'Lý do', request.reason),
-
-        // Request ID
-        _buildDetailRow(Icons.tag, 'Mã đơn', request.id.substring(0, 8)),
       ],
     );
   }
@@ -376,6 +367,9 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Request ID
+        _buildDetailRow(Icons.tag, 'Mã đơn', request.id.substring(0, 8)),
+
         // User info - show different labels based on context
         if (widget.isFromSentToMe)
           _buildDetailRow(
@@ -387,12 +381,11 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
           _buildDetailRow(Icons.work, 'Người quản lý', widget.request.userName),
 
         // Adjustment Date
-        if (request.adjustmentDate != null)
-          _buildDetailRow(
-            Icons.calendar_today,
-            'Ngày điều chỉnh',
-            DateFormat('dd/MM/yyyy').format(request.adjustmentDate!),
-          ),
+        _buildDetailRow(
+          Icons.calendar_today,
+          'Ngày điều chỉnh',
+          DateFormat('dd/MM/yyyy').format(request.adjustmentDate),
+        ),
 
         // Original Check-in Time
         _buildDetailRow(
@@ -424,9 +417,6 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
 
         // Reason
         _buildDetailRow(Icons.description, 'Lý do', request.reason),
-
-        // Request ID
-        _buildDetailRow(Icons.tag, 'Mã đơn', request.id.substring(0, 8)),
       ],
     );
   }
@@ -435,6 +425,8 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Request ID
+        _buildDetailRow(Icons.tag, 'Mã đơn', widget.request.id.substring(0, 8)),
         if (widget.isFromSentToMe)
           _buildDetailRow(
             Icons.person,
@@ -450,9 +442,6 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
 
         // Reason
         _buildDetailRow(Icons.description, 'Lý do', widget.request.reason),
-
-        // Request ID
-        _buildDetailRow(Icons.tag, 'Mã đơn', widget.request.id.substring(0, 8)),
       ],
     );
   }

@@ -140,7 +140,7 @@ class _HomePageState extends State<HomePage> {
                           isActive: state.selectedTabIndex == 1,
                           onTap: () => context.read<HomeCubit>().selectTab(1),
                         ),
-                        const SizedBox(width: 60),
+                        const SizedBox(width: 80),
                         _NavIcon(
                           icon: Icons.notifications_none,
                           isActive: state.selectedTabIndex == 2,
@@ -176,335 +176,340 @@ class _HomeTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => getIt<UserCubit>()..getCurrentUser(),
-      child: Column(
+      child: Stack(
         children: [
-          SizedBox(
-            height: 220,
-            child: Stack(
-              children: [
-                Container(
-                  height: 150,
-                  width: double.infinity,
-                  decoration: const BoxDecoration(color: Color(0xFF0A357D)),
-                  padding: const EdgeInsets.only(
-                    top: 40,
-                    left: 20,
-                    right: 20,
-                    bottom: 20,
-                  ),
-                  child: BlocBuilder<UserCubit, UserState>(
-                    builder: (context, userState) {
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _getDisplayName(userState),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  _getDisplayRole(userState),
-                                  style: const TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          _buildUserAvatar(userState),
-                        ],
-                      );
-                    },
-                  ),
+          Column(
+            children: [
+              Container(
+                height: 120 + MediaQuery.paddingOf(context).top,
+                decoration: const BoxDecoration(color: Color(0xFF0A357D)),
+                padding: EdgeInsets.only(
+                  top: 20 + MediaQuery.paddingOf(context).top,
+                  left: 20,
+                  right: 20,
+                  bottom: 20,
                 ),
-                Positioned(
-                  top: 120,
-                  left: 10,
-                  right: 10,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Row(
+                child: BlocBuilder<UserCubit, UserState>(
+                  builder: (context, userState) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              context.read<HomeCubit>().selectTab(1);
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.05),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _getDisplayName(userState),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
                               ),
-                              padding: const EdgeInsets.all(16),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 54,
-                                    height: 54,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF0EC2F2),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    padding: const EdgeInsets.all(8),
-                                    child: SvgPicture.asset(
-                                      'assets/Image/chamcong.svg',
-                                      width: 26,
-                                      height: 27,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  const Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Chấm công',
-                                          style: TextStyle(
-                                            color: Color(0xFF0A357D),
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          'Theo dõi, kiểm tra chi tiết chấm công,...',
-                                          style: TextStyle(
-                                            color: Colors.black54,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                              Text(
+                                _getDisplayRole(userState),
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
                               ),
-                            ),
+                            ],
                           ),
                         ),
+                        _buildUserAvatar(userState),
                       ],
-                    ),
-                  ),
+                    );
+                  },
                 ),
-              ],
-            ),
-          ),
-
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 16),
-                    const Text(
-                      'TẠO ĐỀ XUẤT',
-                      style: TextStyle(
-                        color: Color(0xFF0A357D),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    GridView.count(
-                      crossAxisCount: 2,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 1.1,
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _ProposalButton(
-                          widget: SvgPicture.asset(
-                            'assets/Image/leave.svg',
-                            width: 50,
-                            height: 50,
-                          ),
-                          label: 'Xin nghỉ phép',
-                          color: Color(0xFF4DD0FE),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const CreateLeaveRequestPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        _ProposalButton(
-                          widget: SvgPicture.asset(
-                            'assets/Image/logWork.svg',
-                            width: 31,
-                            height: 31,
-                          ),
-                          label: 'Log work',
-                          color: Color(0xFF5B8DF6),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const CreateWorkLogPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        _ProposalButton(
-                          widget: SvgPicture.asset(
-                            'assets/Image/attendedAj.svg',
-                            width: 31,
-                            height: 31,
-                          ),
-                          label: 'Điều chỉnh\nchấm công',
-                          color: Color(0xFF3A7FF6),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const CreateAttendanceAdjustmentPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        _ProposalButton(
-                          widget: SvgPicture.asset(
-                            'assets/Image/Attended.svg',
-                            width: 50,
-                            height: 50,
-                          ),
-                          label: 'Làm thêm giờ',
-                          color: Color(0xFF0EC2F2),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const CreateOvertimeRequestPage(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 28),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'DANH SÁCH ĐỀ XUẤT',
+                        const SizedBox(height: 56),
+                        const Text(
+                          'TẠO ĐỀ XUẤT',
                           style: TextStyle(
                             color: Color(0xFF0A357D),
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
-                        TextButton(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CreatedByMePage(),
+                        const SizedBox(height: 16),
+                        GridView.count(
+                          padding: EdgeInsets.only(top: 0),
+                          crossAxisCount: 2,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 1.1,
+                          children: [
+                            _ProposalButton(
+                              widget: SvgPicture.asset(
+                                'assets/image/leave.svg',
+                                width: 50,
+                                height: 50,
+                              ),
+                              label: 'Xin nghỉ phép',
+                              color: Color(0xFF4DD0FE),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CreateLeaveRequestPage(),
+                                  ),
+                                );
+                              },
                             ),
-                          ),
-                          child: Text(
-                            'View all',
-                            style: TextStyle(
+                            _ProposalButton(
+                              widget: SvgPicture.asset(
+                                'assets/image/log_work.svg',
+                                width: 50,
+                                height: 50,
+                              ),
+                              label: 'Log work',
+                              color: Color(0xFF5B8DF6),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CreateWorkLogPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                            _ProposalButton(
+                              widget: SvgPicture.asset(
+                                'assets/image/attended_aj.svg',
+                                width: 50,
+                                height: 50,
+                              ),
+                              label: 'Điều chỉnh\nchấm công',
+                              color: Color(0xFF3A7FF6),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CreateAttendanceAdjustmentPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                            _ProposalButton(
+                              widget: SvgPicture.asset(
+                                'assets/image/attended.svg',
+                                width: 50,
+                                height: 50,
+                              ),
+                              label: 'Làm thêm giờ',
                               color: Color(0xFF0EC2F2),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CreateOvertimeRequestPage(),
+                                  ),
+                                );
+                              },
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    BlocBuilder<RequestsCubit, RequestsState>(
-                      builder: (context, requestsState) {
-                        int count = 0;
-                        debugPrint(
-                          'DEBUG: RequestsState type: ${requestsState.runtimeType}',
-                        );
-                        if (requestsState is RequestsLoaded) {
-                          count = requestsState.totalCount;
-                          debugPrint(
-                            'DEBUG: Total count from RequestsLoaded: $count',
-                          );
-                        } else if (requestsState
-                            is RequestsLoadedWithUserNames) {
-                          count = requestsState.totalCount;
-                          debugPrint(
-                            'DEBUG: Total count from RequestsLoadedWithUserNames: $count',
-                          );
-                        } else if (requestsState is RequestsError) {
-                          debugPrint(
-                            'DEBUG: RequestsError: ${requestsState.message}',
-                          );
-                        }
-                        debugPrint('DEBUG: Final count for badge: $count');
-                        return _RequestListItem(
+                        const SizedBox(height: 32),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'DANH SÁCH ĐỀ XUẤT',
+                              style: TextStyle(
+                                color: Color(0xFF0A357D),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CreatedByMePage(),
+                                ),
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 5,
+                                  horizontal: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFD6F8FF),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(8),
+                                  ),
+                                ),
+                                child: Text(
+                                  'View all',
+                                  style: TextStyle(
+                                    color: Color(0xFF0EC2F2),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        BlocBuilder<RequestsCubit, RequestsState>(
+                          builder: (context, requestsState) {
+                            int count = 0;
+                            debugPrint(
+                              'DEBUG: RequestsState type: ${requestsState.runtimeType}',
+                            );
+                            if (requestsState is RequestsLoaded) {
+                              count = requestsState.totalCount;
+                              debugPrint(
+                                'DEBUG: Total count from RequestsLoaded: $count',
+                              );
+                            } else if (requestsState
+                                is RequestsLoadedWithUserNames) {
+                              count = requestsState.totalCount;
+                              debugPrint(
+                                'DEBUG: Total count from RequestsLoadedWithUserNames: $count',
+                              );
+                            } else if (requestsState is RequestsError) {
+                              debugPrint(
+                                'DEBUG: RequestsError: ${requestsState.message}',
+                              );
+                            }
+                            debugPrint('DEBUG: Final count for badge: $count');
+                            return _RequestListItem(
+                              widget: SvgPicture.asset(
+                                'assets/image/sent_to_me.svg',
+                                width: 42,
+                                height: 42,
+                                fit: BoxFit.cover,
+                              ),
+                              label: 'Sent to me',
+                              count: count,
+                              color: Color(0xFF0EC2F2),
+                              hasNotification: count > 0,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const SentToMePage(),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        _RequestListItem(
                           widget: SvgPicture.asset(
-                            'assets/Image/Sent_to_me.svg',
-                            width: 62,
-                            height: 62,
-                            fit: BoxFit.contain,
+                            'assets/image/created_by_me.svg',
+                            width: 42,
+                            height: 42,
                           ),
-                          label: 'Sent to me',
-                          count: count,
-                          color: Color(0xFF0EC2F2),
-                          hasNotification: count > 0,
+
+                          label: 'Created by me',
+                          count: createdByMeCount,
+                          color: Color(0xFF5B8DF6),
+                          hasNotification: createdByMeCount > 0,
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const SentToMePage(),
+                                builder: (context) => const CreatedByMePage(),
                               ),
                             );
                           },
-                        );
-                      },
+                        ),
+                        const SizedBox(height: 56),
+                      ],
                     ),
-                    const SizedBox(height: 12),
-                    _RequestListItem(
-                      widget: SvgPicture.asset(
-                        'assets/Image/Created_by_me.svg',
-                        width: 62,
-                        height: 62,
-                      ),
-
-                      label: 'Created by me',
-                      count: createdByMeCount,
-                      color: Color(0xFF5B8DF6),
-                      hasNotification: createdByMeCount > 0,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const CreatedByMePage(),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 80),
-                  ],
+                  ),
                 ),
               ),
+            ],
+          ),
+          Positioned(
+            top: 76 + MediaQuery.paddingOf(context).top,
+            left: 10,
+            right: 10,
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      context.read<HomeCubit>().selectTab(1);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 54,
+                            height: 54,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0EC2F2),
+                              shape: BoxShape.circle,
+                            ),
+                            padding: const EdgeInsets.all(8),
+                            child: SvgPicture.asset(
+                              'assets/image/chamcong.svg',
+                              width: 26,
+                              height: 27,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Chấm công',
+                                  style: TextStyle(
+                                    color: Color(0xFF0A357D),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  'Theo dõi, kiểm tra chi tiết chấm công,...',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -570,7 +575,6 @@ class _HomeTab extends StatelessWidget {
   }
 }
 
-// Profile Tab Widget - separated to avoid rebuilding
 class _ProfileTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -593,17 +597,17 @@ class _ProfileTab extends StatelessWidget {
                     Container(
                       height: 150,
                       width: double.infinity,
-                      decoration: const BoxDecoration(color: Color(0xFF0A357D)),
+                      padding: EdgeInsets.only(top: 12),
+                      color: Color(0xFF0A357D),
                       child: SafeArea(
-                        child: const Center(
-                          child: Text(
-                            'Account',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        child: Text(
+                          'Thông tin cá nhân',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
@@ -636,30 +640,8 @@ class _ProfileTab extends StatelessWidget {
               // Content Section with proper Expanded usage
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    children: [
-                      // // User Info Card
-                      // Container(
-                      //   width: double.infinity,
-                      //   decoration: BoxDecoration(
-                      //     color: Colors.white,
-                      //     borderRadius: BorderRadius.circular(16),
-                      //     boxShadow: [
-                      //       BoxShadow(
-                      //         color: Colors.black.withValues(alpha: 0.1),
-                      //         blurRadius: 10,
-                      //         offset: const Offset(0, 4),
-                      //       ),
-                      //     ],
-                      //   ),
-                      //   padding: const EdgeInsets.all(20),
-                      //   child: _buildUserInfoCard(state),
-                      // ),
-                      _buildProfileDetailsList(state, context),
-                      const SizedBox(height: 80), // Bottom navigation space
-                    ],
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12).copyWith(bottom: 32),
+                  child: _buildProfileDetailsList(state, context),
                 ),
               ),
             ],
@@ -716,7 +698,7 @@ class _ProfileTab extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   user.role.isNotEmpty ? user.role : 'Nhân viên',
-                  style: const TextStyle(color: Colors.grey, fontSize: 14),
+                  style: const TextStyle(color: Colors.black87, fontSize: 14),
                 ),
               ],
             ),
@@ -759,9 +741,9 @@ class _ProfileTab extends StatelessWidget {
             value: _maskPhoneNumber(user.phone),
           ),
           const Divider(
-            color: Colors.grey,
+            color: Colors.black87,
             thickness: 1,
-            height: 20,
+            height: 1,
             indent: 16,
             endIndent: 16,
           ),
@@ -770,9 +752,9 @@ class _ProfileTab extends StatelessWidget {
             value: _formatDate(user.birthday),
           ),
           const Divider(
-            color: Colors.grey,
+               color: Colors.black87,
             thickness: 1,
-            height: 20,
+            height: 1,
             indent: 16,
             endIndent: 16,
           ),
@@ -781,20 +763,20 @@ class _ProfileTab extends StatelessWidget {
             value: user.address.isNotEmpty ? user.address : 'Chưa cập nhật',
           ),
           const Divider(
-            color: Colors.grey,
+               color: Colors.black87,
             thickness: 1,
-            height: 20,
+            height: 1,
             indent: 16,
             endIndent: 16,
           ),
-          TextButton(
-            onPressed: () => _showLogoutDialog(context),
+          GestureDetector(
+            onTap: () => _showLogoutDialog(context),
             child: _ProfileDetailItem(icon: Icons.logout, value: 'Logout'),
           ),
           const Divider(
-            color: Colors.grey,
+               color: Colors.black87,
             thickness: 1,
-            height: 20,
+            height: 1,
             indent: 16,
             endIndent: 16,
           ),
@@ -802,9 +784,9 @@ class _ProfileTab extends StatelessWidget {
           TextButton(
             onPressed: () => _navigateToEditProfile(context, user),
             child: Text(
-              'Update infomation',
+              'Cập nhật thông tin',
               style: TextStyle(
-                color: Colors.blue,
+                color: Color(0xFF00C7F2),
                 fontWeight: FontWeight.w500,
                 fontSize: 17,
               ),
@@ -870,7 +852,6 @@ class _ProfileTab extends StatelessWidget {
   }
 }
 
-// Cached Floating Action Button Widget - separate to avoid rebuilding
 class _CachedFloatingActionButton extends StatelessWidget {
   const _CachedFloatingActionButton();
 
@@ -1121,9 +1102,11 @@ class _ProposalButton extends StatelessWidget {
             ),
           ),
         ),
-        Material(
-          color: color,
-          borderRadius: BorderRadius.circular(16),
+        Container(
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
             onTap: onTap,
@@ -1140,7 +1123,7 @@ class _ProposalButton extends StatelessWidget {
                       children: [
                         widget,
                         Icon(
-                          Icons.arrow_right_alt,
+                          Icons.keyboard_arrow_right_rounded,
                           color: Colors.white,
                           size: 25,
                         ),
@@ -1187,15 +1170,15 @@ class _RequestListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white70,
+      color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 0),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         child: InkWell(
           borderRadius: BorderRadius.circular(24),
           onTap: onTap,
           child: Row(
             children: [
-              Align(alignment: const Alignment(0, -.1), child: widget),
+              widget,
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
@@ -1226,7 +1209,11 @@ class _RequestListItem extends StatelessWidget {
                     ),
                   ),
                 ),
-              const Icon(Icons.arrow_right_alt, color: Colors.grey, size: 28),
+              const Icon(
+                Icons.keyboard_arrow_right,
+                color: Colors.grey,
+                size: 28,
+              ),
             ],
           ),
         ),
@@ -1245,12 +1232,12 @@ class _CustomFloatingActionButton extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        width: 70,
-        height: 70,
+        width: 80,
+        height: 80,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white, width: 3),
-          color: Colors.blue,
+          color: Color(0xFF00C7F2),
         ),
         child: const Center(
           child: Icon(Icons.add, color: Colors.white, size: 32),
@@ -1324,12 +1311,12 @@ class _ProfileDetailItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey, size: 20),
+          Icon(icon, color: Colors.black87, size: 20),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(color: Colors.grey, fontSize: 16),
+              style: const TextStyle(color: Colors.black87, fontSize: 16),
             ),
           ),
         ],

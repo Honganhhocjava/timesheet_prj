@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:timesheet_project/features/work_log/domain/entities/work_log_entity.dart';
 import 'package:timesheet_project/features/work_log/domain/repositories/work_log_repository.dart';
-import 'package:timesheet_project/features/work_log/data/models/work_log_model.dart';
 import 'package:timesheet_project/features/user/domain/entities/user_entity.dart';
 import 'package:timesheet_project/features/user/data/models/user_model.dart';
 
