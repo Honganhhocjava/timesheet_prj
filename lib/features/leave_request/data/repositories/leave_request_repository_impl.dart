@@ -174,31 +174,31 @@ class LeaveRequestRepositoryImpl implements LeaveRequestRepository {
       String managerId,
       ) async {
     try {
-      print('DEBUG: Getting leave requests for manager: $managerId');
+     // print('DEBUG: Getting leave requests for manager: $managerId');
 
       final querySnapshot = await _firestore
           .collection('leave_requests')
           .where('idManager', isEqualTo: managerId)
           .get();
 
-      print('DEBUG: Found ${querySnapshot.docs.length} leave request documents');
+     // print('DEBUG: Found ${querySnapshot.docs.length} leave request documents');
 
       final results = <LeaveRequestEntity>[];
       for (final doc in querySnapshot.docs) {
         try {
           final data = doc.data();
-          print('DEBUG: Processing document ${doc.id} with data: ${data.keys}');
+         // print('DEBUG: Processing document ${doc.id} with data: ${data.keys}');
 
           final entity = _jsonToEntity(data);
           results.add(entity);
         } catch (e) {
-          print('DEBUG: Error processing document ${doc.id}: $e');
+        //  print('DEBUG: Error processing document ${doc.id}: $e');
           // Continue with other documents
         }
       }
 
       results.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      print('DEBUG: Successfully processed ${results.length} leave requests');
+     // print('DEBUG: Successfully processed ${results.length} leave requests');
 
       return results;
     } catch (e) {

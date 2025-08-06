@@ -31,7 +31,7 @@ class RequestsCubit extends Cubit<RequestsState> {
         return;
       }
 
-      // Get requests where current user is the manager
+
       debugPrint('DEBUG: Current user ID: ${currentUser.uid}');
 
       final leaveRequests = await _leaveRequestRepository
@@ -44,7 +44,7 @@ class RequestsCubit extends Cubit<RequestsState> {
         'DEBUG: Raw attendance adjustments count: ${attendanceAdjustments.length}',
       );
 
-      // Try-catch for overtime requests to prevent errors if collection doesn't exist
+
       List<OvertimeRequestEntity> overtimeRequests = [];
       try {
         overtimeRequests = await _overtimeRequestRepository
@@ -59,7 +59,6 @@ class RequestsCubit extends Cubit<RequestsState> {
         // Continue with empty list if collection doesn't exist yet
       }
 
-      // Collect all unique user IDs
       final userIds = <String>{};
       for (final request in leaveRequests) {
         userIds.add(request.idUser);
@@ -115,7 +114,6 @@ class RequestsCubit extends Cubit<RequestsState> {
         return;
       }
 
-      // Get requests created by current user
       debugPrint('DEBUG: Loading requests created by user: ${currentUser.uid}');
 
       final leaveRequests = await _leaveRequestRepository
@@ -145,7 +143,7 @@ class RequestsCubit extends Cubit<RequestsState> {
         // Continue with empty list if collection doesn't exist yet
       }
 
-      // Collect all unique manager IDs to get their names
+
       final managerIds = <String>{};
       for (final request in leaveRequests) {
         managerIds.add(request.idManager);
@@ -184,7 +182,7 @@ class RequestsCubit extends Cubit<RequestsState> {
           leaveRequests: leaveRequests,
           attendanceAdjustments: attendanceAdjustments,
           overtimeRequests: overtimeRequests,
-          userMap: managerMap, // In this case, it's actually manager names
+          userMap: managerMap,
           totalCount: totalCount,
         ),
       );

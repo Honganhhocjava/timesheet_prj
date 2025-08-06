@@ -65,15 +65,19 @@ class SurveyPage extends StatelessWidget {
               );
             } else if (state is SurveyLoaded || state is SurveyCompleted) {
               final questions = (state as dynamic).questions;
+              final answer = (state as dynamic).answers;
 
               return ListView.builder(
                 itemCount: questions.length,
                 itemBuilder: (context, index) {
                   final question = questions[index];
+                  final selectedAnswer = answer[index];
+
                   return QuestionCard(
                     key: ValueKey('question_$index'),
                     question: question,
                     index: index,
+                    selectedAnswer: selectedAnswer,
                   );
                 },
               );

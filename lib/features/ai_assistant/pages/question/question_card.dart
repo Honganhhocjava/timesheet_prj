@@ -7,11 +7,14 @@ import 'package:timesheet_project/features/ai_assistant/pages/survey/survey_cubi
 class QuestionCard extends StatefulWidget {
   final Question question;
   final int index;
+  final String? selectedAnswer;
+
 
   const QuestionCard({
     super.key,
     required this.question,
     required this.index,
+    required this.selectedAnswer,
   });
 
   @override
@@ -20,6 +23,23 @@ class QuestionCard extends StatefulWidget {
 
 class _QuestionCardState extends State<QuestionCard> {
   String? selectedOption;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedOption = widget.selectedAnswer; // Khởi tạo khi widget được tạo
+  }
+
+  @override
+  void didUpdateWidget(covariant QuestionCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Nếu selectedAnswer trong widget thay đổi thì cập nhật lại state
+    if (widget.selectedAnswer != oldWidget.selectedAnswer) {
+      setState(() {
+        selectedOption = widget.selectedAnswer;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +58,7 @@ class _QuestionCardState extends State<QuestionCard> {
             ),
             const SizedBox(height: 12),
             ...widget.question.options.map(
-              (option) => RadioListTile<String>(
+                  (option) => RadioListTile<String>(
                 title: Text(option),
                 value: option,
                 groupValue: selectedOption,
@@ -56,3 +76,4 @@ class _QuestionCardState extends State<QuestionCard> {
     );
   }
 }
+

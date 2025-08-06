@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    return  MultiBlocProvider(
       providers: [
         BlocProvider<AuthCubit>(create: (context) => getIt<AuthCubit>()),
         BlocProvider<UserCubit>(create: (context) => getIt<UserCubit>()),
@@ -37,3 +37,20 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+// theme: ThemeData(
+//           scaffoldBackgroundColor: Color(0xFFF5F5F5),
+//           appBarTheme: AppBarTheme(
+//             backgroundColor: Colors.transparent,
+//             shadowColor: Colors.transparent,
+//             elevation: 0,
+//             surfaceTintColor: Colors.transparent,
+//           ),
+//           colorScheme: ColorScheme.light(
+//             primary: Colors.black,
+//             onPrimary: Colors.white,
+//             //secondary: Colors.grey,
+//           ),
+//           textTheme: TextTheme(
+//             bodyMedium: TextStyle(color: Colors.black),
+//           ),
+//         ),

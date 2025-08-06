@@ -49,26 +49,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
       body: BlocListener<UserCubit, UserState>(
         listener: (context, state) {
           if (state is UserSaved) {
-            TopSnackbar.showGreen(context,' Đã cập nhật thành công!');
+            TopSnackbar.showGreen(context, ' Đã cập nhật thành công!');
             Navigator.of(context).pop();
           } else if (state is UserError) {
-            TopSnackbar.show(context,'Lỗi: ${state.message}');
-          } else if (state is UserLoading) {
-          }
+            TopSnackbar.show(context, 'Lỗi: ${state.message}');
+          } else if (state is UserLoading) {}
         },
         child: Column(
           children: [
             // Header
             _buildHeader(),
+          //  const SizedBox(height: 110),
             // Content
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    const SizedBox(height: 20),
                     // User Info Card
-                    _buildUserInfoCard(),
-                    const SizedBox(height: 24),
+                    // _buildUserInfoCard(),
                     // Form
                     _buildForm(),
                     const SizedBox(height: 32),
@@ -87,52 +85,67 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Widget _buildHeader() {
-    return Container(
-      height: 150,
+    return SizedBox(
+      height: 220,
       width: double.infinity,
-      decoration: const BoxDecoration(color: Color(0xFF003E83)),
-      child: SafeArea(
-        child: Stack(
-          children: [
-            Positioned(
-              left: 8.0,
-              top: 40,
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 24,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            height: 150,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Color(0xFF003E83),
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  left: 8.0,
+                  top: 44,
+                  child: GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            // Title
-            const Center(
-              child: Text(
-                'Update Information',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                // Title
+                const Center(
+                  child: Text(
+                    'Update Information',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+
+          Positioned(
+            top: 110,
+            left: 10,
+            right: 10,
+            child: _buildUserInfoCard(),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildUserInfoCard() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -148,71 +161,70 @@ class _EditProfilePageState extends State<EditProfilePage> {
       child: Row(
         children: [
           // Avatar
-          Stack(
-            children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: const Color(0xFF0A357D),
-                backgroundImage: widget.user.avatarUrl.isNotEmpty
-                    ? NetworkImage(widget.user.avatarUrl)
-                    : null,
-                child: widget.user.avatarUrl.isEmpty
-                    ? Text(
-                        widget.user.firstName.isNotEmpty
-                            ? widget.user.firstName[0].toUpperCase()
-                            : 'U',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    : null,
-              ),
-              // Edit avatar button
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  width: 25,
-                  height: 25,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF00C7F2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.camera_alt,
-                    color: Colors.white,
-                    size: 14,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 16),
-          // User Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          SizedBox(
+            child: Stack(
               children: [
-                Text(
-                  '${widget.user.firstName} ${widget.user.lastName}',
-                  style: const TextStyle(
-                    color: Color(0xFF42425B),
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                CircleAvatar(
+                  radius: 30,
+                  backgroundColor: const Color(0xFF0A357D),
+                  backgroundImage: widget.user.avatarUrl.isNotEmpty
+                      ? NetworkImage(widget.user.avatarUrl)
+                      : null,
+                  child: widget.user.avatarUrl.isEmpty
+                      ? Text(
+                          widget.user.firstName.isNotEmpty
+                              ? widget.user.firstName[0].toUpperCase()
+                              : 'U',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      : null,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  widget.user.role.isNotEmpty ? widget.user.role : 'Nhân viên',
-                  style: const TextStyle(
-                    color: Color(0xFF6C6C81),
-                    fontSize: 14,
+                // Edit avatar button
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    width: 25,
+                    height: 25,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF00C7F2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt,
+                      color: Colors.white,
+                      size: 14,
+                    ),
                   ),
                 ),
               ],
             ),
+          ),
+          // User Info
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${widget.user.firstName} ${widget.user.lastName}',
+                style: const TextStyle(
+                  color: Color(0xFF42425B),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                widget.user.role.isNotEmpty ? widget.user.role : 'Nhân viên',
+                style: const TextStyle(
+                  color: Color(0xFF6C6C81),
+                  fontSize: 14,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -220,69 +232,67 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Widget _buildForm() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            _buildTextField(
-              controller: _firstNameController,
-              label: 'First name',
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Vui lòng nhập tên';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              controller: _lastNameController,
-              label: 'Last name',
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Vui lòng nhập họ';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              controller: _phoneController,
-              label: 'Phone',
-              keyboardType: TextInputType.phone,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Vui lòng nhập số điện thoại';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              controller: _addressController,
-              label: 'Address',
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Vui lòng nhập địa chỉ';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              controller: _roleController,
-              label: 'Role',
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Vui lòng nhập chức vụ';
-                }
-                return null;
-              },
-            ),
-          ],
-        ),
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          const SizedBox(height: 30),
+          _buildTextField(
+            controller: _firstNameController,
+            label: 'First name',
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Vui lòng nhập tên';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildTextField(
+            controller: _lastNameController,
+            label: 'Last name',
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Vui lòng nhập họ';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildTextField(
+            controller: _phoneController,
+            label: 'Phone',
+            keyboardType: TextInputType.phone,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Vui lòng nhập số điện thoại';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildTextField(
+            controller: _addressController,
+            label: 'Address',
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Vui lòng nhập địa chỉ';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildTextField(
+            controller: _roleController,
+            label: 'Role',
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Vui lòng nhập chức vụ';
+              }
+              return null;
+            },
+          ),
+        ],
       ),
     );
   }

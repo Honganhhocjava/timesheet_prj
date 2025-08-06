@@ -58,20 +58,13 @@ Future<List<NotificationItem>> fetchAllNotificationsForCurrentUser() async {
   final userId = user.uid;
   final firestore = FirebaseFirestore.instance;
 
-  // Get current user info to determine role
   final userDoc = await firestore.collection('users').doc(userId).get();
   final userData = userDoc.data();
   final userRole = userData?['role'] ?? 'Nhân viên';
 
-  print('DEBUG: Current user role: $userRole');
-  print('DEBUG: Current user ID: $userId');
-
   // Determine if user is manager or employee
   final isManager = userRole == 'Quản lý';
   final fieldToQuery = isManager ? 'idManager' : 'idUser';
-
-  print('DEBUG: Is manager: $isManager');
-  print('DEBUG: Field to query: $fieldToQuery');
 
   Future<Map<String, dynamic>?> getUserInfo(String userId) async {
     final doc = await firestore.collection('users').doc(userId).get();
@@ -91,10 +84,6 @@ Future<List<NotificationItem>> fetchAllNotificationsForCurrentUser() async {
       .where(fieldToQuery, isEqualTo: userId)
       .get();
 
-  print('DEBUG: Found ${leaveDocs.docs.length} leave requests');
-  print('DEBUG: Found ${overtimeDocs.docs.length} overtime requests');
-  print('DEBUG: Found ${attendanceDocs.docs.length} attendance requests');
-
   final List<NotificationItem> notifications = [];
 
   Future<void> addNotificationsFromDocs(
@@ -106,15 +95,11 @@ Future<List<NotificationItem>> fetchAllNotificationsForCurrentUser() async {
       final data = doc.data();
       final status = data['status'] ?? 'pending';
 
-      print('DEBUG: Processing $type request ${doc.id} with status: $status');
-
-      // For employees, only show notifications for status changes (not pending)
       if (!isManager) {
         if (status == 'pending') {
-          print('DEBUG: Skipping pending request for employee');
           continue; // Skip pending requests for employees
         }
-        print('DEBUG: Including non-pending request for employee');
+        debugPrint('DEBUG: Including non-pending request for employee');
       }
 
       final senderId = data['idUser'] ?? '';
@@ -127,22 +112,19 @@ Future<List<NotificationItem>> fetchAllNotificationsForCurrentUser() async {
         // Manager viewing requests sent to them - show sender info
         final senderInfo = await getUserInfo(senderId);
         displayName =
-            ((senderInfo?['firstName'] ?? '') +
-                    ' ' +
-                    (senderInfo?['lastName'] ?? ''))
+            ((senderInfo?['firstName'] ?? '') + (senderInfo?['lastName'] ?? ''))
                 .trim();
         avatarUrl = senderInfo?['avatarUrl'] ?? '';
-        print('DEBUG: Manager view - showing sender: $displayName');
+        debugPrint('DEBUG: Manager view - showing sender: $displayName');
       } else {
         // Employee viewing their own requests - show manager info
         final managerInfo = await getUserInfo(managerId);
         displayName =
             ((managerInfo?['firstName'] ?? '') +
-                    ' ' +
                     (managerInfo?['lastName'] ?? ''))
                 .trim();
         avatarUrl = managerInfo?['avatarUrl'] ?? '';
-        print('DEBUG: Employee view - showing manager: $displayName');
+        debugPrint('DEBUG: Employee view - showing manager: $displayName');
       }
 
       // Parse dates based on type
@@ -156,6 +138,24 @@ Future<List<NotificationItem>> fetchAllNotificationsForCurrentUser() async {
         overtimeDate = DateTime.tryParse(data['overtimeDate'] ?? '');
       }
 
+      // Tạo title với trạng thái
+      String statusText;
+      switch (status) {
+        case 'approved':
+          statusText = 'đã duyệt';
+          break;
+        case 'rejected':
+          statusText = 'đã từ chối';
+          break;
+        case 'cancelled':
+          statusText = 'đã hủy';
+          break;
+        default:
+          statusText = 'chờ duyệt';
+      }
+
+      final titleWithStatus = '$title $statusText';
+
       notifications.add(
         NotificationItem(
           id: doc.id,
@@ -163,7 +163,7 @@ Future<List<NotificationItem>> fetchAllNotificationsForCurrentUser() async {
           senderId: isManager ? senderId : managerId,
           senderName: displayName,
           senderAvatarUrl: avatarUrl,
-          title: title,
+          title: titleWithStatus,
           createdAt:
               DateTime.tryParse(data['createdAt'] ?? '') ?? DateTime.now(),
           status: status,
@@ -175,7 +175,7 @@ Future<List<NotificationItem>> fetchAllNotificationsForCurrentUser() async {
         ),
       );
 
-      print('DEBUG: Added notification for $type request');
+      debugPrint('DEBUG: Added notification for $type request');
     }
   }
 
@@ -191,7 +191,7 @@ Future<List<NotificationItem>> fetchAllNotificationsForCurrentUser() async {
     'Đơn điều chỉnh chấm công',
   );
 
-  print('DEBUG: Total notifications found: ${notifications.length}');
+  debugPrint('DEBUG: Total notifications found: ${notifications.length}');
 
   notifications.sort((a, b) => b.createdAt.compareTo(a.createdAt));
   return notifications;
@@ -252,7 +252,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 subtitle: Text(
                   '${item.senderName}  ${DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt)}',
                 ),
-                trailing: _buildStatusBadge(item.status),
                 onTap: () async {
                   final user = FirebaseAuth.instance.currentUser;
                   final isManager = user != null && item.senderId != user.uid;
@@ -261,8 +260,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     MaterialPageRoute(
                       builder: (context) => RequestDetailPage(
                         request: item.toRequestItem(),
-                        isFromSentToMe:
-                            isManager, // true nếu là manager, false nếu là nhân viên
+                        isFromSentToMe: isManager,
                       ),
                     ),
                   );
@@ -271,43 +269,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
             },
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildStatusBadge(String status) {
-    Color color;
-    String text;
-    switch (status) {
-      case 'approved':
-        color = Colors.green;
-        text = 'Đã duyệt';
-        break;
-      case 'rejected':
-        color = Colors.red;
-        text = 'Từ chối';
-        break;
-      case 'cancelled':
-        color = Colors.grey;
-        text = 'Đã hủy';
-        break;
-      default:
-        color = Colors.orange;
-        text = 'Chờ duyệt';
-    }
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
-        ),
       ),
     );
   }

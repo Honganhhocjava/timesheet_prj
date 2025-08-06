@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:timesheet_project/di/di.dart';
 import 'package:timesheet_project/features/ai_assistant/pages/icon_ai_assistant/floating_ai_ball.dart';
 
@@ -92,7 +93,7 @@ class _HomePageState extends State<HomePage> {
         }
       });
     } catch (e) {
-      print('Error loading created by me count: $e');
+      debugPrint('Error loading created by me count: $e');
     }
   }
 
@@ -104,9 +105,6 @@ class _HomePageState extends State<HomePage> {
         BlocProvider(
           create: (context) {
             final cubit = getIt<RequestsCubit>();
-            print(
-              'DEBUG: Creating RequestsCubit and calling getPendingRequestsCount',
-            );
             cubit.getPendingRequestsCount();
             return cubit;
           },
@@ -180,55 +178,134 @@ class _HomeTab extends StatelessWidget {
       create: (context) => getIt<UserCubit>()..getCurrentUser(),
       child: Column(
         children: [
-          Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(color: Color(0xFF0A357D)),
-            padding: const EdgeInsets.only(
-              top: 40,
-              left: 20,
-              right: 20,
-              bottom: 20,
-            ),
-            child: BlocBuilder<UserCubit, UserState>(
-              builder: (context, userState) {
-                return GestureDetector(
-                  onTap: () {
-                    context.read<HomeCubit>().selectTab(3);
-                  },
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _getDisplayName(userState),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _getDisplayRole(userState),
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      _buildUserAvatar(userState),
-                    ],
+          SizedBox(
+            height: 220,
+            child: Stack(
+              children: [
+                Container(
+                  height: 150,
+                  width: double.infinity,
+                  decoration: const BoxDecoration(color: Color(0xFF0A357D)),
+                  padding: const EdgeInsets.only(
+                    top: 40,
+                    left: 20,
+                    right: 20,
+                    bottom: 20,
                   ),
-                );
-              },
+                  child: BlocBuilder<UserCubit, UserState>(
+                    builder: (context, userState) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _getDisplayName(userState),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _getDisplayRole(userState),
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          _buildUserAvatar(userState),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                Positioned(
+                  top: 120,
+                  left: 10,
+                  right: 10,
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              context.read<HomeCubit>().selectTab(1);
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.05),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 54,
+                                    height: 54,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF0EC2F2),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    padding: const EdgeInsets.all(8),
+                                    child: SvgPicture.asset(
+                                      'assets/Image/chamcong.svg',
+                                      width: 26,
+                                      height: 27,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  const Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Chấm công',
+                                          style: TextStyle(
+                                            color: Color(0xFF0A357D),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          'Theo dõi, kiểm tra chi tiết chấm công,...',
+                                          style: TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          // Nội dung Home tab
+
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
@@ -236,81 +313,7 @@ class _HomeTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 24),
-                    // Chấm công section
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                context.read<HomeCubit>().selectTab(1);
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.05,
-                                      ),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                padding: const EdgeInsets.all(16),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF0EC2F2),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      padding: const EdgeInsets.all(8),
-                                      child: const Icon(
-                                        Icons.calendar_today,
-                                        color: Colors.white,
-                                        size: 28,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    const Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Chấm công',
-                                            style: TextStyle(
-                                              color: Color(0xFF0A357D),
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                          SizedBox(height: 4),
-                                          Text(
-                                            'Theo dõi, kiểm tra chi tiết chấm công,...',
-                                            style: TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-                    // TẠO ĐỀ XUẤT section
+                    const SizedBox(height: 16),
                     const Text(
                       'TẠO ĐỀ XUẤT',
                       style: TextStyle(
@@ -329,7 +332,11 @@ class _HomeTab extends StatelessWidget {
                       childAspectRatio: 1.1,
                       children: [
                         _ProposalButton(
-                          icon: Icons.event,
+                          widget: SvgPicture.asset(
+                            'assets/Image/leave.svg',
+                            width: 50,
+                            height: 50,
+                          ),
                           label: 'Xin nghỉ phép',
                           color: Color(0xFF4DD0FE),
                           onTap: () {
@@ -343,7 +350,11 @@ class _HomeTab extends StatelessWidget {
                           },
                         ),
                         _ProposalButton(
-                          icon: Icons.access_time,
+                          widget: SvgPicture.asset(
+                            'assets/Image/logWork.svg',
+                            width: 31,
+                            height: 31,
+                          ),
                           label: 'Log work',
                           color: Color(0xFF5B8DF6),
                           onTap: () {
@@ -356,7 +367,11 @@ class _HomeTab extends StatelessWidget {
                           },
                         ),
                         _ProposalButton(
-                          icon: Icons.edit,
+                          widget: SvgPicture.asset(
+                            'assets/Image/attendedAj.svg',
+                            width: 31,
+                            height: 31,
+                          ),
                           label: 'Điều chỉnh\nchấm công',
                           color: Color(0xFF3A7FF6),
                           onTap: () {
@@ -370,7 +385,11 @@ class _HomeTab extends StatelessWidget {
                           },
                         ),
                         _ProposalButton(
-                          icon: Icons.alarm,
+                          widget: SvgPicture.asset(
+                            'assets/Image/Attended.svg',
+                            width: 50,
+                            height: 50,
+                          ),
                           label: 'Làm thêm giờ',
                           color: Color(0xFF0EC2F2),
                           onTap: () {
@@ -386,7 +405,6 @@ class _HomeTab extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 28),
-                    // DANH SÁCH ĐỀ XUẤT section
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -420,28 +438,33 @@ class _HomeTab extends StatelessWidget {
                     BlocBuilder<RequestsCubit, RequestsState>(
                       builder: (context, requestsState) {
                         int count = 0;
-                        print(
+                        debugPrint(
                           'DEBUG: RequestsState type: ${requestsState.runtimeType}',
                         );
                         if (requestsState is RequestsLoaded) {
                           count = requestsState.totalCount;
-                          print(
+                          debugPrint(
                             'DEBUG: Total count from RequestsLoaded: $count',
                           );
                         } else if (requestsState
                             is RequestsLoadedWithUserNames) {
                           count = requestsState.totalCount;
-                          print(
+                          debugPrint(
                             'DEBUG: Total count from RequestsLoadedWithUserNames: $count',
                           );
                         } else if (requestsState is RequestsError) {
-                          print(
+                          debugPrint(
                             'DEBUG: RequestsError: ${requestsState.message}',
                           );
                         }
-                        print('DEBUG: Final count for badge: $count');
+                        debugPrint('DEBUG: Final count for badge: $count');
                         return _RequestListItem(
-                          icon: Icons.download,
+                          widget: SvgPicture.asset(
+                            'assets/Image/Sent_to_me.svg',
+                            width: 62,
+                            height: 62,
+                            fit: BoxFit.contain,
+                          ),
                           label: 'Sent to me',
                           count: count,
                           color: Color(0xFF0EC2F2),
@@ -459,7 +482,12 @@ class _HomeTab extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     _RequestListItem(
-                      icon: Icons.upload,
+                      widget: SvgPicture.asset(
+                        'assets/Image/Created_by_me.svg',
+                        width: 62,
+                        height: 62,
+                      ),
+
                       label: 'Created by me',
                       count: createdByMeCount,
                       color: Color(0xFF5B8DF6),
@@ -557,56 +585,80 @@ class _ProfileTab extends StatelessWidget {
           return Column(
             children: [
               // AppBar Section
-              Container(
-                height: 150,
-                width: double.infinity,
-                decoration: const BoxDecoration(color: Color(0xFF0A357D)),
-                child: SafeArea(
-                  child: const Center(
-                    child: Text(
-                      'Account',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+              SizedBox(
+                height: 200,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      height: 150,
+                      width: double.infinity,
+                      decoration: const BoxDecoration(color: Color(0xFF0A357D)),
+                      child: SafeArea(
+                        child: const Center(
+                          child: Text(
+                            'Account',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    Positioned(
+                      top: 120,
+                      left: 10,
+                      right: 10,
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(20),
+                        child: _buildUserInfoCard(state),
+                      ),
+                    ),
+                  ],
                 ),
               ),
+              SizedBox(height: 50),
 
               // Content Section with proper Expanded usage
               Expanded(
-                child: Transform.translate(
-                  offset: const Offset(0, -30), // Move up to create overlap
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      children: [
-                        // User Info Card
-                        Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          padding: const EdgeInsets.all(20),
-                          child: _buildUserInfoCard(state),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Profile Details List
-                        _buildProfileDetailsList(state, context),
-                        const SizedBox(height: 80), // Bottom navigation space
-                      ],
-                    ),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: [
+                      // // User Info Card
+                      // Container(
+                      //   width: double.infinity,
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.white,
+                      //     borderRadius: BorderRadius.circular(16),
+                      //     boxShadow: [
+                      //       BoxShadow(
+                      //         color: Colors.black.withValues(alpha: 0.1),
+                      //         blurRadius: 10,
+                      //         offset: const Offset(0, 4),
+                      //       ),
+                      //     ],
+                      //   ),
+                      //   padding: const EdgeInsets.all(20),
+                      //   child: _buildUserInfoCard(state),
+                      // ),
+                      _buildProfileDetailsList(state, context),
+                      const SizedBox(height: 80), // Bottom navigation space
+                    ],
                   ),
                 ),
               ),
@@ -703,76 +755,62 @@ class _ProfileTab extends StatelessWidget {
       return Column(
         children: [
           _ProfileDetailItem(
-            icon: Icons.person,
-            label: 'Họ và tên',
-            value: '${user.lastName} ${user.firstName}',
-          ),
-          _ProfileDetailItem(
             icon: Icons.phone,
-            label: 'Số điện thoại',
             value: _maskPhoneNumber(user.phone),
           ),
-
+          const Divider(
+            color: Colors.grey,
+            thickness: 1,
+            height: 20,
+            indent: 16,
+            endIndent: 16,
+          ),
           _ProfileDetailItem(
             icon: Icons.calendar_today,
-            label: 'Ngày sinh',
             value: _formatDate(user.birthday),
+          ),
+          const Divider(
+            color: Colors.grey,
+            thickness: 1,
+            height: 20,
+            indent: 16,
+            endIndent: 16,
           ),
           _ProfileDetailItem(
             icon: Icons.location_on,
-            label: 'Địa chỉ',
             value: user.address.isNotEmpty ? user.address : 'Chưa cập nhật',
           ),
-          _ProfileDetailItem(
-            icon: Icons.business,
-            label: 'Chức vụ',
-            value: user.role.isNotEmpty ? user.role : 'Chưa cập nhật',
+          const Divider(
+            color: Colors.grey,
+            thickness: 1,
+            height: 20,
+            indent: 16,
+            endIndent: 16,
           ),
-          SizedBox(height: 30),
-          // Edit Profile Option
+          TextButton(
+            onPressed: () => _showLogoutDialog(context),
+            child: _ProfileDetailItem(icon: Icons.logout, value: 'Logout'),
+          ),
+          const Divider(
+            color: Colors.grey,
+            thickness: 1,
+            height: 20,
+            indent: 16,
+            endIndent: 16,
+          ),
+          SizedBox(height: 50),
           TextButton(
             onPressed: () => _navigateToEditProfile(context, user),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Text(
-                'Chỉnh sửa thông tin',
-                style: TextStyle(
-                  color: Color(0xFF0A357D),
-                  fontWeight: FontWeight.w500,
-                ),
+            child: Text(
+              'Update infomation',
+              style: TextStyle(
+                color: Colors.blue,
+                fontWeight: FontWeight.w500,
+                fontSize: 17,
               ),
             ),
           ),
           // Logout Option
-          GestureDetector(
-            onTap: () => _showLogoutDialog(context),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.logout, color: Colors.red),
-                  SizedBox(width: 16),
-                  Text(
-                    'Đăng xuất',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ],
       );
     }
@@ -898,20 +936,25 @@ class _CachedFloatingActionButton extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Request Options
-                _RequestOption(
-                  icon: Icons.event,
-                  title: 'Xin nghỉ phép',
-                  subtitle: 'Tạo đơn xin nghỉ phép',
-                  color: const Color(0xFF4DD0FE),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CreateLeaveRequestPage(),
-                      ),
-                    );
-                  },
+                Stack(
+                  children: [
+                    _RequestOption(
+                      icon: Icons.event,
+                      title: 'Xin nghỉ phép',
+                      subtitle: 'Tạo đơn xin nghỉ phép',
+                      color: const Color(0xFF4DD0FE),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const CreateLeaveRequestPage(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
                 _RequestOption(
                   icon: Icons.access_time,
@@ -1006,7 +1049,7 @@ class _RequestOption extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(icon, color: color, size: 24),
@@ -1048,13 +1091,13 @@ class _RequestOption extends StatelessWidget {
 
 // Widget cho proposal button
 class _ProposalButton extends StatelessWidget {
-  final IconData icon;
+  final Widget widget;
   final String label;
   final Color color;
   final VoidCallback? onTap;
 
   const _ProposalButton({
-    required this.icon,
+    required this.widget,
     required this.label,
     required this.color,
     this.onTap,
@@ -1062,42 +1105,70 @@ class _ProposalButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: color,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SizedBox(
-            height: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(icon, color: Colors.white, size: 32),
-                const SizedBox(height: 16),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  ),
-                ),
-              ],
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned(
+          bottom: -8,
+          left: 0,
+          right: 0,
+          child: Container(
+            height: 20,
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              color: Colors.lightBlue.shade100,
+              borderRadius: BorderRadius.circular(20),
             ),
           ),
         ),
-      ),
+        Material(
+          color: color,
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                height: double.infinity,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        widget,
+                        Icon(
+                          Icons.arrow_right_alt,
+                          color: Colors.white,
+                          size: 25,
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
 
-// Widget cho request list item
 class _RequestListItem extends StatelessWidget {
-  final IconData icon;
+  final Widget widget;
   final String label;
   final int count;
   final Color color;
@@ -1105,7 +1176,7 @@ class _RequestListItem extends StatelessWidget {
   final VoidCallback? onTap;
 
   const _RequestListItem({
-    required this.icon,
+    required this.widget,
     required this.label,
     required this.count,
     required this.color,
@@ -1115,24 +1186,16 @@ class _RequestListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+    return Card(
+      color: Colors.white70,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 0),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: onTap,
           child: Row(
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.all(10),
-                child: Icon(icon, color: color, size: 28),
-              ),
+              Align(alignment: const Alignment(0, -.1), child: widget),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
@@ -1140,7 +1203,7 @@ class _RequestListItem extends StatelessWidget {
                   style: const TextStyle(
                     color: Color(0xFF0A357D),
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 18,
                   ),
                 ),
               ),
@@ -1163,7 +1226,7 @@ class _RequestListItem extends StatelessWidget {
                     ),
                   ),
                 ),
-              const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
+              const Icon(Icons.arrow_right_alt, color: Colors.grey, size: 28),
             ],
           ),
         ),
@@ -1172,43 +1235,22 @@ class _RequestListItem extends StatelessWidget {
   }
 }
 
-// === CUSTOM FLOATING ACTION BUTTON WIDGET ===
 class _CustomFloatingActionButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const _CustomFloatingActionButton({required this.onPressed});
 
   @override
-  //   Widget build(BuildContext context) {
-  //     return Container(
-  //       width: 90,
-  //       height: 90,
-  //       decoration: BoxDecoration(
-  //         shape: BoxShape.circle,
-  //         border: Border.all(color: Colors.white, width: 3),
-  //         // Gradient background
-  //         color: Colors.blue
-  //       ),
-  //       child: FloatingActionButton(
-  //         onPressed: onPressed,
-  //         backgroundColor: Colors.transparent,
-  //         elevation: 0,
-  //         shape: const CircleBorder(),
-  //         child: const Icon(Icons.add, color: Colors.white, size: 32),
-  //       ),
-  //     );
-  //   }
-  // }
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        width: 90,
-        height: 90,
+        width: 70,
+        height: 70,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white, width: 3),
-          color: Colors.blue, // hoặc gradient
+          color: Colors.blue,
         ),
         child: const Center(
           child: Icon(Icons.add, color: Colors.white, size: 32),
@@ -1269,137 +1311,25 @@ class _NavIcon extends StatelessWidget {
   }
 }
 
-// Widget cho profile option item
-// class _ProfileOptionItem extends StatelessWidget {
-//   final IconData icon;
-//   final String title;
-//   final String subtitle;
-//   final VoidCallback onTap;
-//   final bool isLogout;
-//
-//   const _ProfileOptionItem({
-//     required this.icon,
-//     required this.title,
-//     required this.subtitle,
-//     required this.onTap,
-//     required this.isLogout,
-//   });
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Material(
-//       color: Colors.white,
-//       borderRadius: BorderRadius.circular(16),
-//       elevation: 2,
-//       shadowColor: Colors.black.withValues(alpha: 0.1),
-//       child: InkWell(
-//         borderRadius: BorderRadius.circular(16),
-//         onTap: onTap,
-//         child: Padding(
-//           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-//           child: Row(
-//             children: [
-//               Container(
-//                 decoration: BoxDecoration(
-//                   color: isLogout
-//                       ? Colors.red.withValues(alpha: 0.15)
-//                       : const Color(0xFF0A357D).withValues(alpha: 0.15),
-//                   borderRadius: BorderRadius.circular(12),
-//                 ),
-//                 padding: const EdgeInsets.all(10),
-//
-//                 child: Icon(
-//                   icon,
-//                   color: isLogout ? Colors.red : const Color(0xFF0A357D),
-//                   size: 24,
-//                 ),
-//               ),
-//               const SizedBox(width: 16),
-//               Expanded(
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Text(
-//                       title,
-//                       style: TextStyle(
-//                         color: isLogout ? Colors.red : const Color(0xFF0A357D),
-//                         fontWeight: FontWeight.bold,
-//                         fontSize: 16,
-//                       ),
-//                     ),
-//                     const SizedBox(height: 4),
-//                     Text(
-//                       subtitle,
-//                       style: const TextStyle(color: Colors.grey, fontSize: 14),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//               Icon(Icons.chevron_right, color: Colors.grey, size: 24),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// Widget cho profile detail item
 class _ProfileDetailItem extends StatelessWidget {
   final IconData icon;
-  final String label;
   final String value;
 
-  const _ProfileDetailItem({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
+  const _ProfileDetailItem({required this.icon, required this.value});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       child: Row(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF0A357D).withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.all(10),
-            child: Icon(icon, color: const Color(0xFF0A357D), size: 24),
-          ),
+          Icon(icon, color: Colors.grey, size: 20),
           const SizedBox(width: 16),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: Color(0xFF0A357D),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: const TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-              ],
+            child: Text(
+              value,
+              style: const TextStyle(color: Colors.grey, fontSize: 16),
             ),
           ),
         ],

@@ -37,7 +37,10 @@ class _SentToMePageState extends State<SentToMePage>
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<RequestsCubit>()..loadSentToMeRequests(),
+      create: (context) =>
+      getIt<RequestsCubit>()
+        ..loadSentToMeRequests()
+        ..loadCreatedByMeRequests(),
       child: Scaffold(
         backgroundColor: const Color(0xFFF7FAFF),
         appBar: AppBar(
@@ -193,9 +196,10 @@ class _SentToMePageState extends State<SentToMePage>
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: () => context
-                            .read<RequestsCubit>()
-                            .loadSentToMeRequests(),
+                        onPressed: () =>
+                            context
+                                .read<RequestsCubit>()
+                                .loadSentToMeRequests(),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF0A357D),
                         ),
@@ -215,7 +219,7 @@ class _SentToMePageState extends State<SentToMePage>
                     ? state.leaveRequests
                     : (state as RequestsLoaded).leaveRequests;
                 final attendanceAdjustments =
-                    state is RequestsLoadedWithUserNames
+                state is RequestsLoadedWithUserNames
                     ? state.attendanceAdjustments
                     : (state as RequestsLoaded).attendanceAdjustments;
                 final overtimeRequests = state is RequestsLoadedWithUserNames
@@ -227,44 +231,56 @@ class _SentToMePageState extends State<SentToMePage>
 
                 var allRequests = [
                   ...leaveRequests.map(
-                    (req) => RequestItem(
-                      id: req.id,
-                      userName:
+                        (req) =>
+                        RequestItem(
+                          id: req.id,
+                          userName:
                           userMap[req.idUser] ??
-                          'User ${req.idUser.substring(0, 8)}',
-                      reason: req.reason,
-                      status: req.status.toString().split('.').last,
-                      createdAt: req.createdAt,
-                      requestType: 'leave',
-                      startDate: req.startDate,
-                      endDate: req.endDate,
-                    ),
+                              'User ${req.idUser.substring(0, 8)}',
+                          reason: req.reason,
+                          status: req.status
+                              .toString()
+                              .split('.')
+                              .last,
+                          createdAt: req.createdAt,
+                          requestType: 'leave',
+                          startDate: req.startDate,
+                          endDate: req.endDate,
+                        ),
                   ),
                   ...attendanceAdjustments.map(
-                    (adj) => RequestItem(
-                      id: adj.id,
-                      userName:
+                        (adj) =>
+                        RequestItem(
+                          id: adj.id,
+                          userName:
                           userMap[adj.idUser] ??
-                          'User ${adj.idUser.substring(0, 8)}',
-                      reason: adj.reason,
-                      status: adj.status.toString().split('.').last,
-                      createdAt: adj.createdAt,
-                      requestType: 'attendance',
-                      adjustmentDate: adj.adjustmentDate,
-                    ),
+                              'User ${adj.idUser.substring(0, 8)}',
+                          reason: adj.reason,
+                          status: adj.status
+                              .toString()
+                              .split('.')
+                              .last,
+                          createdAt: adj.createdAt,
+                          requestType: 'attendance',
+                          adjustmentDate: adj.adjustmentDate,
+                        ),
                   ),
                   ...overtimeRequests.map(
-                    (req) => RequestItem(
-                      id: req.id,
-                      userName:
+                        (req) =>
+                        RequestItem(
+                          id: req.id,
+                          userName:
                           userMap[req.idUser] ??
-                          'User ${req.idUser.substring(0, 8)}',
-                      reason: req.reason,
-                      status: req.status.toString().split('.').last,
-                      createdAt: req.createdAt,
-                      requestType: 'overtime',
-                      overtimeDate: req.overtimeDate,
-                    ),
+                              'User ${req.idUser.substring(0, 8)}',
+                          reason: req.reason,
+                          status: req.status
+                              .toString()
+                              .split('.')
+                              .last,
+                          createdAt: req.createdAt,
+                          requestType: 'overtime',
+                          overtimeDate: req.overtimeDate,
+                        ),
                   ),
                 ];
 
@@ -354,6 +370,155 @@ class _SentToMePageState extends State<SentToMePage>
       ),
     );
   }
+
+//   Widget _buildCreatedByMeTab() {
+//     return Column(
+//       children: [
+//         // Filter Tabs
+//         SizedBox(
+//           height: 60,
+//           child: Container(
+//             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+//             child: ListView(
+//               scrollDirection: Axis.horizontal,
+//               children: [
+//                 _buildFilterChip('All'),
+//                 _buildFilterChip('Xin nghỉ phép'),
+//                 _buildFilterChip('Điều chỉnh chấm công'),
+//                 _buildFilterChip('Làm thêm giờ'),
+//               ],
+//             ),
+//           ),
+//         ),
+//         // Request List
+//         Expanded(
+//           child: BlocBuilder<RequestsCubit, RequestsState>(
+//             builder: (context, state) {
+//               if (state is RequestsLoading) {
+//                 return const Center(
+//                   child: CircularProgressIndicator(color: Color(0xFF0A357D)),
+//                 );
+//               }
+//
+//               if (state is RequestsError) {
+//                 return Center(
+//                   child: Column(
+//                     mainAxisAlignment: MainAxisAlignment.center,
+//                     children: [
+//                       const Icon(
+//                         Icons.error_outline,
+//                         color: Colors.red,
+//                         size: 64,
+//                       ),
+//                       const SizedBox(height: 16),
+//                       Text(
+//                         'Lỗi: ${state.message}',
+//                         style: const TextStyle(color: Colors.red, fontSize: 16),
+//                         textAlign: TextAlign.center,
+//                       ),
+//                       const SizedBox(height: 16),
+//                       ElevatedButton(
+//                         onPressed: () => context
+//                             .read<RequestsCubit>()
+//                             .loadCreatedByMeRequests(),
+//                         style: ElevatedButton.styleFrom(
+//                           backgroundColor: const Color(0xFF0A357D),
+//                         ),
+//                         child: const Text(
+//                           'Thử lại',
+//                           style: TextStyle(color: Colors.white),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 );
+//               }
+//
+//               if (state is RequestsLoaded ||
+//                   state is RequestsLoadedWithUserNames) {
+//                 final leaveRequests = state is RequestsLoadedWithUserNames
+//                     ? state.leaveRequests
+//                     : (state as RequestsLoaded).leaveRequests;
+//                 final attendanceAdjustments =
+//                     state is RequestsLoadedWithUserNames
+//                     ? state.attendanceAdjustments
+//                     : (state as RequestsLoaded).attendanceAdjustments;
+//                 final overtimeRequests = state is RequestsLoadedWithUserNames
+//                     ? state.overtimeRequests
+//                     : (state as RequestsLoaded).overtimeRequests;
+//                 final managerMap = state is RequestsLoadedWithUserNames
+//                     ? state.userMap
+//                     : <String, String>{};
+//
+//                 var allRequests = [
+//                   ...leaveRequests.map(
+//                     (req) => RequestItem.leave(req, managerMap[req.idManager]),
+//                   ),
+//                   ...attendanceAdjustments.map(
+//                     (adj) =>
+//                         RequestItem.attendance(adj, managerMap[adj.idManager]),
+//                   ),
+//                   ...overtimeRequests.map(
+//                     (req) =>
+//                         RequestItem.overtime(req, managerMap[req.idManager]),
+//                   ),
+//                 ];
+//
+//                 // Filter requests based on selected filter
+//                 if (_selectedFilter != 'All') {
+//                   allRequests = allRequests.where((request) {
+//                     if (_selectedFilter == 'Xin nghỉ phép') {
+//                       return request.isLeaveRequest;
+//                     } else if (_selectedFilter == 'Điều chỉnh chấm công') {
+//                       return request.isAttendanceAdjustment;
+//                     } else if (_selectedFilter == 'Làm thêm giờ') {
+//                       return request.isOvertimeRequest;
+//                     }
+//                     return true;
+//                   }).toList();
+//                 }
+//
+//                 // Sort by creation date (newest first)
+//                 allRequests.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+//
+//                 if (allRequests.isEmpty) {
+//                   return const Center(
+//                     child: Column(
+//                       mainAxisAlignment: MainAxisAlignment.center,
+//                       children: [
+//                         Icon(
+//                           Icons.inbox_outlined,
+//                           size: 64,
+//                           color: Colors.grey,
+//                         ),
+//                         SizedBox(height: 16),
+//                         Text(
+//                           'Không có đơn nào được tạo',
+//                           style: TextStyle(fontSize: 16, color: Colors.grey),
+//                         ),
+//                       ],
+//                     ),
+//                   );
+//                 }
+//
+//                 return ListView.builder(
+//                   padding: const EdgeInsets.all(16),
+//                   itemCount: allRequests.length,
+//                   itemBuilder: (context, index) {
+//                     final request = allRequests[index];
+//                     return _RequestListTile(request: request);
+//                   },
+//                 );
+//               }
+//
+//               return const Center(child: Text('Không có dữ liệu'));
+//             },
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
 }
 
 class _RequestListTile extends StatelessWidget {
@@ -380,119 +545,82 @@ class _RequestListTile extends StatelessWidget {
           ],
         ),
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header with status and date
-          Row(
-            children: [
-              // Status Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _getStatusColor(request.status),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      _getStatusIcon(request.status),
-                      color: Colors.white,
-                      size: 14,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      _getStatusText(request.status),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Spacer(),
-              Text(
-                DateFormat('dd/MM/yyyy').format(request.createdAt),
-                style: const TextStyle(
-                  color: Color(0xFF0A357D),
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Request Title
-          Text(
-            _getRequestTitle(request),
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: Color(0xFF0A357D),
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // Request Details
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with status and date
+            Row(
               children: [
-                Row(
-                  children: [
-                    const Icon(Icons.person, size: 16, color: Colors.grey),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Gửi từ: ${request.userName}',
+                // Status Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(request.status),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _getStatusIcon(request.status),
+                        color: Colors.white,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _getStatusText(request.status),
                         style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(Icons.description, size: 16, color: Colors.grey),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Lý do: ${request.reason}',
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+                const Spacer(),
+                Text(
+                  DateFormat('dd/MM/yyyy').format(request.createdAt),
+                  style: const TextStyle(
+                    color: Color(0xFF0A357D),
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                if (_getDateRange(request).isNotEmpty) ...[
-                  const SizedBox(height: 8),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Request Title
+            Text(
+              _getRequestTitle(request),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Color(0xFF0A357D),
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // Request Details
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Row(
                     children: [
-                      const Icon(
-                        Icons.calendar_today,
-                        size: 16,
-                        color: Colors.grey,
-                      ),
+                      const Icon(Icons.person, size: 16, color: Colors.grey),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          _getDateRange(request),
+                          'Gửi từ: ${request.userName}',
                           style: const TextStyle(
                             color: Colors.grey,
                             fontSize: 14,
@@ -501,23 +629,66 @@ class _RequestListTile extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 8),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.description,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Lý do: ${request.reason}',
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (_getDateRange(request).isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.calendar_today,
+                          size: 16,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _getDateRange(request),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   void _navigateToDetail(BuildContext context) async {
     final result = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
-        builder: (context) => RequestDetailPage(
-          request: request,
-          isFromSentToMe: true,
-        ),
+        builder: (context) =>
+            RequestDetailPage(request: request, isFromSentToMe: true),
       ),
     );
 
@@ -573,14 +744,27 @@ class _RequestListTile extends StatelessWidget {
   }
 
   String _getRequestTitle(RequestItem request) {
+    String baseTitle = '';
     if (request.isLeaveRequest) {
-      return 'Đơn xin nghỉ phép';
+      baseTitle = 'Đơn xin nghỉ phép';
     } else if (request.isAttendanceAdjustment) {
-      return 'Đơn điều chỉnh chấm công';
+      baseTitle = 'Đơn điều chỉnh chấm công';
     } else if (request.isOvertimeRequest) {
-      return 'Đơn xin làm thêm giờ';
+      baseTitle = 'Đơn xin làm thêm giờ';
+    } else {
+      baseTitle = 'Đơn yêu cầu';
     }
-    return 'Đơn yêu cầu';
+
+    // Add status information to the title
+    if (request.status.toLowerCase() == 'rejected') {
+      return '$baseTitle bị từ chối';
+    } else if (request.status.toLowerCase() == 'approved') {
+      return '$baseTitle được duyệt';
+    } else if (request.status.toLowerCase() == 'cancelled') {
+      return '$baseTitle bị hủy';
+    } else {
+      return baseTitle;
+    }
   }
 
   String _getDateRange(RequestItem request) {

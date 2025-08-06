@@ -490,6 +490,7 @@ class _CreatedByMePageState extends State<CreatedByMePage>
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: ChoiceChip(
+        avatar: null,
         label: Text(label),
         selected: isSelected,
         onSelected: (selected) {
@@ -497,6 +498,7 @@ class _CreatedByMePageState extends State<CreatedByMePage>
             _selectedFilter = label;
           });
         },
+        showCheckmark: false,
         selectedColor: const Color(0xFF0A357D),
         backgroundColor: Colors.white,
         labelStyle: TextStyle(

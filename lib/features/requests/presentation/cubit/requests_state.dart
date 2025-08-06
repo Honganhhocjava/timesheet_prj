@@ -26,7 +26,7 @@ class RequestsLoadedWithUserNames extends RequestsState {
   final List<LeaveRequestEntity> leaveRequests;
   final List<AttendanceAdjustmentEntity> attendanceAdjustments;
   final List<OvertimeRequestEntity> overtimeRequests;
-  final Map<String, String> userMap; // userId -> fullName
+  final Map<String, String> userMap;
   final int totalCount;
 
   RequestsLoadedWithUserNames({

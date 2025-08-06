@@ -372,7 +372,6 @@ class TimesheetsPage extends StatelessWidget {
         return _buildRejectedDayContent(dayDetails);
       case AttendanceDayStatus.noData:
         return _buildNoDataContent();
-      case AttendanceDayStatus.normal:
       default:
         return _buildNormalDayContent(dayDetails);
     }
