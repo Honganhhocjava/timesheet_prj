@@ -6,6 +6,7 @@ import 'package:timesheet_project/features/ai_assistant/pages/icon_ai_assistant/
 
 import 'package:timesheet_project/features/attendance/presentation/cubit/home_cubit.dart';
 import 'package:timesheet_project/features/attendance/presentation/cubit/home_state.dart';
+import 'package:timesheet_project/features/attendance/presentation/pages/calendar_page.dart';
 import 'package:timesheet_project/features/auth/presentation/pages/login_page.dart';
 import 'package:timesheet_project/features/user/presentation/cubit/user_cubit.dart';
 import 'package:timesheet_project/features/user/presentation/cubit/user_state.dart';
@@ -14,7 +15,6 @@ import 'package:timesheet_project/features/user/presentation/pages/edit_profile_
 import 'package:timesheet_project/features/leave_request/presentation/pages/create_leave_request_page.dart';
 import 'package:timesheet_project/features/attendance_adjustment/presentation/pages/create_attendance_adjustment_page.dart';
 import 'package:timesheet_project/features/overtime_request/presentation/pages/create_overtime_request_page.dart';
-import 'package:timesheet_project/features/attendance/presentation/pages/timesheets_page.dart';
 import 'package:timesheet_project/features/requests/presentation/pages/sent_to_me_page.dart';
 import 'package:timesheet_project/features/requests/presentation/pages/created_by_me_page.dart';
 import 'package:timesheet_project/features/requests/presentation/cubit/requests_cubit.dart';
@@ -46,10 +46,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _createdByMeCount = 0;
 
-  // Pre-create all tab widgets to avoid rebuilding
   late final List<Widget> _tabWidgets;
 
-  // Cache floatingActionButtonLocation to avoid rebuilding
   FloatingActionButtonLocation? _cachedFloatingButtonLocation;
 
   @override
@@ -57,12 +55,15 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _loadCreatedByMeCount();
     _initializeTabWidgets();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.read<UserCubit>().getCurrentUser();
+    });
   }
 
   void _initializeTabWidgets() {
     _tabWidgets = [
       _HomeTab(createdByMeCount: _createdByMeCount),
-      const TimesheetsPage(),
+      const TimesheetCalendarPage(),
       const NotificationsPage(),
       _ProfileTab(),
     ];
@@ -78,7 +79,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadCreatedByMeCount() async {
     try {
-      final tempCubit = RequestsCubit(getIt(), getIt(), getIt(), getIt());
+      final tempCubit =
+          RequestsCubit(getIt(), getIt(), getIt(), getIt(), getIt());
 
       await tempCubit.getCreatedByMeCount();
 
@@ -174,23 +176,24 @@ class _HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<UserCubit>()..getCurrentUser(),
-      child: Stack(
-        children: [
-          Column(
-            children: [
-              Container(
-                height: 120 + MediaQuery.paddingOf(context).top,
-                decoration: const BoxDecoration(color: Color(0xFF0A357D)),
-                padding: EdgeInsets.only(
-                  top: 20 + MediaQuery.paddingOf(context).top,
-                  left: 20,
-                  right: 20,
-                  bottom: 20,
-                ),
-                child: BlocBuilder<UserCubit, UserState>(
-                  builder: (context, userState) {
+    return Stack(
+      children: [
+        Column(
+          children: [
+            Container(
+              height: 120 + MediaQuery.paddingOf(context).top,
+              decoration: const BoxDecoration(color: Color(0xFF0A357D)),
+              padding: EdgeInsets.only(
+                top: 20 + MediaQuery.paddingOf(context).top,
+                left: 20,
+                right: 20,
+                bottom: 20,
+              ),
+              child: BlocBuilder<UserCubit, UserState>(
+                builder: (context, state) {
+                  if (state is UserLoading) {
+                    return CircularProgressIndicator();
+                  } else if (state is UserLoaded) {
                     return Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -200,7 +203,7 @@ class _HomeTab extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                _getDisplayName(userState),
+                                _getDisplayName(state),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -208,7 +211,7 @@ class _HomeTab extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                _getDisplayRole(userState),
+                                _getDisplayRole(state),
                                 style: const TextStyle(
                                   color: Colors.white70,
                                   fontSize: 14,
@@ -217,222 +220,295 @@ class _HomeTab extends StatelessWidget {
                             ],
                           ),
                         ),
-                        _buildUserAvatar(userState),
+                        _buildUserAvatar(state),
                       ],
                     );
-                  },
-                ),
+                  } else {
+                    return SizedBox();
+                  }
+                },
               ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 56),
-                        const Text(
-                          'TẠO ĐỀ XUẤT',
-                          style: TextStyle(
-                            color: Color(0xFF0A357D),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 56),
+                      const Text(
+                        'TẠO ĐỀ XUẤT',
+                        style: TextStyle(
+                          color: Color(0xFF0A357D),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
-                        const SizedBox(height: 16),
-                        GridView.count(
-                          padding: EdgeInsets.only(top: 0),
-                          crossAxisCount: 2,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 1.1,
-                          children: [
-                            _ProposalButton(
-                              widget: SvgPicture.asset(
-                                'assets/image/leave.svg',
-                                width: 50,
-                                height: 50,
-                              ),
-                              label: 'Xin nghỉ phép',
-                              color: Color(0xFF4DD0FE),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CreateLeaveRequestPage(),
-                                  ),
-                                );
-                              },
+                      ),
+                      const SizedBox(height: 16),
+                      GridView.count(
+                        padding: EdgeInsets.only(top: 0),
+                        crossAxisCount: 2,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 1.1,
+                        children: [
+                          _ProposalButton(
+                            widget: SvgPicture.asset(
+                              'assets/image/leave.svg',
+                              width: 50,
+                              height: 50,
                             ),
-                            _ProposalButton(
-                              widget: SvgPicture.asset(
-                                'assets/image/log_work.svg',
-                                width: 50,
-                                height: 50,
-                              ),
-                              label: 'Log work',
-                              color: Color(0xFF5B8DF6),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CreateWorkLogPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                            _ProposalButton(
-                              widget: SvgPicture.asset(
-                                'assets/image/attended_aj.svg',
-                                width: 50,
-                                height: 50,
-                              ),
-                              label: 'Điều chỉnh\nchấm công',
-                              color: Color(0xFF3A7FF6),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CreateAttendanceAdjustmentPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                            _ProposalButton(
-                              widget: SvgPicture.asset(
-                                'assets/image/attended.svg',
-                                width: 50,
-                                height: 50,
-                              ),
-                              label: 'Làm thêm giờ',
-                              color: Color(0xFF0EC2F2),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CreateOvertimeRequestPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 32),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'DANH SÁCH ĐỀ XUẤT',
-                              style: TextStyle(
-                                color: Color(0xFF0A357D),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => Navigator.push(
+                            label: 'Xin nghỉ phép',
+                            color: Color(0xFF4DD0FE),
+                            onTap: () {
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => CreatedByMePage(),
+                                  builder: (context) =>
+                                      const CreateLeaveRequestPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          _ProposalButton(
+                            widget: SvgPicture.asset(
+                              'assets/image/log_work.svg',
+                              width: 50,
+                              height: 50,
+                            ),
+                            label: 'Log work',
+                            color: Color(0xFF5B8DF6),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CreateWorkLogPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          _ProposalButton(
+                            widget: SvgPicture.asset(
+                              'assets/image/attended_aj.svg',
+                              width: 50,
+                              height: 50,
+                            ),
+                            label: 'Điều chỉnh\nchấm công',
+                            color: Color(0xFF3A7FF6),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CreateAttendanceAdjustmentPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          _ProposalButton(
+                            widget: SvgPicture.asset(
+                              'assets/image/attended.svg',
+                              width: 50,
+                              height: 50,
+                            ),
+                            label: 'Làm thêm giờ',
+                            color: Color(0xFF0EC2F2),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CreateOvertimeRequestPage(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 32),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'DANH SÁCH ĐỀ XUẤT',
+                            style: TextStyle(
+                              color: Color(0xFF0A357D),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CreatedByMePage(),
+                              ),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 5,
+                                horizontal: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD6F8FF),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(8),
                                 ),
                               ),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 5,
-                                  horizontal: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFD6F8FF),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(8),
-                                  ),
-                                ),
-                                child: Text(
-                                  'View all',
-                                  style: TextStyle(
-                                    color: Color(0xFF0EC2F2),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
+                              child: Text(
+                                'View all',
+                                style: TextStyle(
+                                  color: Color(0xFF0EC2F2),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        BlocBuilder<RequestsCubit, RequestsState>(
-                          builder: (context, requestsState) {
-                            int count = 0;
-                            debugPrint(
-                              'DEBUG: RequestsState type: ${requestsState.runtimeType}',
-                            );
-                            if (requestsState is RequestsLoaded) {
-                              count = requestsState.totalCount;
-                              debugPrint(
-                                'DEBUG: Total count from RequestsLoaded: $count',
-                              );
-                            } else if (requestsState
-                                is RequestsLoadedWithUserNames) {
-                              count = requestsState.totalCount;
-                              debugPrint(
-                                'DEBUG: Total count from RequestsLoadedWithUserNames: $count',
-                              );
-                            } else if (requestsState is RequestsError) {
-                              debugPrint(
-                                'DEBUG: RequestsError: ${requestsState.message}',
-                              );
-                            }
-                            debugPrint('DEBUG: Final count for badge: $count');
-                            return _RequestListItem(
-                              widget: SvgPicture.asset(
-                                'assets/image/sent_to_me.svg',
-                                width: 42,
-                                height: 42,
-                                fit: BoxFit.cover,
-                              ),
-                              label: 'Sent to me',
-                              count: count,
-                              color: Color(0xFF0EC2F2),
-                              hasNotification: count > 0,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const SentToMePage(),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        _RequestListItem(
-                          widget: SvgPicture.asset(
-                            'assets/image/created_by_me.svg',
-                            width: 42,
-                            height: 42,
                           ),
-
-                          label: 'Created by me',
-                          count: createdByMeCount,
-                          color: Color(0xFF5B8DF6),
-                          hasNotification: createdByMeCount > 0,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const CreatedByMePage(),
-                              ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      BlocBuilder<RequestsCubit, RequestsState>(
+                        builder: (context, requestsState) {
+                          int count = 0;
+                          debugPrint(
+                            'DEBUG: RequestsState type: ${requestsState.runtimeType}',
+                          );
+                          if (requestsState is RequestsLoaded) {
+                            count = requestsState.totalCount;
+                            debugPrint(
+                              'DEBUG: Total count from RequestsLoaded: $count',
                             );
-                          },
+                          } else if (requestsState
+                              is RequestsLoadedWithUserNames) {
+                            count = requestsState.totalCount;
+                            debugPrint(
+                              'DEBUG: Total count from RequestsLoadedWithUserNames: $count',
+                            );
+                          } else if (requestsState is RequestsError) {
+                            debugPrint(
+                              'DEBUG: RequestsError: ${requestsState.message}',
+                            );
+                          }
+                          debugPrint('DEBUG: Final count for badge: $count');
+                          return _RequestListItem(
+                            widget: SvgPicture.asset(
+                              'assets/image/sent_to_me.svg',
+                              width: 42,
+                              height: 42,
+                              fit: BoxFit.cover,
+                            ),
+                            label: 'Sent to me',
+                            count: count,
+                            color: Color(0xFF0EC2F2),
+                            hasNotification: count > 0,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SentToMePage(),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _RequestListItem(
+                        widget: SvgPicture.asset(
+                          'assets/image/created_by_me.svg',
+                          width: 42,
+                          height: 42,
                         ),
-                        const SizedBox(height: 56),
+                        label: 'Created by me',
+                        count: createdByMeCount,
+                        color: Color(0xFF5B8DF6),
+                        hasNotification: createdByMeCount > 0,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CreatedByMePage(),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 56),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        Positioned(
+          top: 76 + MediaQuery.paddingOf(context).top,
+          left: 10,
+          right: 10,
+          child: Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    context.read<HomeCubit>().selectTab(1);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 54,
+                          height: 54,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF0EC2F2),
+                            shape: BoxShape.circle,
+                          ),
+                          padding: const EdgeInsets.all(8),
+                          child: SvgPicture.asset(
+                            'assets/image/chamcong.svg',
+                            width: 26,
+                            height: 27,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Chấm công',
+                                style: TextStyle(
+                                  color: Color(0xFF0A357D),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Theo dõi, kiểm tra chi tiết chấm công,...',
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -440,80 +516,8 @@ class _HomeTab extends StatelessWidget {
               ),
             ],
           ),
-          Positioned(
-            top: 76 + MediaQuery.paddingOf(context).top,
-            left: 10,
-            right: 10,
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      context.read<HomeCubit>().selectTab(1);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 54,
-                            height: 54,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF0EC2F2),
-                              shape: BoxShape.circle,
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: SvgPicture.asset(
-                              'assets/image/chamcong.svg',
-                              width: 26,
-                              height: 27,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Chấm công',
-                                  style: TextStyle(
-                                    color: Color(0xFF0A357D),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  'Theo dõi, kiểm tra chi tiết chấm công,...',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -550,9 +554,8 @@ class _HomeTab extends StatelessWidget {
       return CircleAvatar(
         radius: 22,
         backgroundColor: const Color(0xFF0A357D),
-        backgroundImage: user.avatarUrl.isNotEmpty
-            ? NetworkImage(user.avatarUrl)
-            : null,
+        backgroundImage:
+            user.avatarUrl.isNotEmpty ? NetworkImage(user.avatarUrl) : null,
         child: user.avatarUrl.isEmpty
             ? Text(
                 fullName.isNotEmpty ? fullName[0].toUpperCase() : 'U',
@@ -578,76 +581,74 @@ class _HomeTab extends StatelessWidget {
 class _ProfileTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<UserCubit>(),
-      child: BlocBuilder<UserCubit, UserState>(
-        builder: (context, state) {
-          if (state is UserInitial) {
-            context.read<UserCubit>().getCurrentUser();
-          }
+    return BlocBuilder<UserCubit, UserState>(
+      builder: (context, state) {
+        if (state is UserInitial) {
+          context.read<UserCubit>().getCurrentUser();
+        }
 
-          return Column(
-            children: [
-              // AppBar Section
-              SizedBox(
-                height: 200,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Container(
-                      height: 150,
-                      width: double.infinity,
-                      padding: EdgeInsets.only(top: 12),
-                      color: Color(0xFF0A357D),
-                      child: SafeArea(
-                        child: Text(
-                          'Thông tin cá nhân',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 120,
-                      left: 10,
-                      right: 10,
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
+        return Column(
+          children: [
+            // AppBar Section
+            SizedBox(
+              height: 200,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    height: 150,
+                    width: double.infinity,
+                    padding: EdgeInsets.only(top: 12),
+                    color: Color(0xFF0A357D),
+                    child: SafeArea(
+                      child: Text(
+                        'Thông tin cá nhân',
+                        style: TextStyle(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
-                        padding: const EdgeInsets.all(20),
-                        child: _buildUserInfoCard(state),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  Positioned(
+                    top: 120,
+                    left: 10,
+                    right: 10,
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(20),
+                      child: _buildUserInfoCard(state),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 50),
+            ),
+            SizedBox(height: 50),
 
-              // Content Section with proper Expanded usage
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 12).copyWith(bottom: 32),
-                  child: _buildProfileDetailsList(state, context),
-                ),
+            // Content Section with proper Expanded usage
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 12)
+                    .copyWith(bottom: 32),
+                child: _buildProfileDetailsList(state, context),
               ),
-            ],
-          );
-        },
-      ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -667,9 +668,8 @@ class _ProfileTab extends StatelessWidget {
           CircleAvatar(
             radius: 30,
             backgroundColor: const Color(0xFF0A357D),
-            backgroundImage: user.avatarUrl.isNotEmpty
-                ? NetworkImage(user.avatarUrl)
-                : null,
+            backgroundImage:
+                user.avatarUrl.isNotEmpty ? NetworkImage(user.avatarUrl) : null,
             child: user.avatarUrl.isEmpty
                 ? Text(
                     fullName.isNotEmpty ? fullName[0].toUpperCase() : 'U',
@@ -752,7 +752,7 @@ class _ProfileTab extends StatelessWidget {
             value: _formatDate(user.birthday),
           ),
           const Divider(
-               color: Colors.black87,
+            color: Colors.black87,
             thickness: 1,
             height: 1,
             indent: 16,
@@ -763,7 +763,7 @@ class _ProfileTab extends StatelessWidget {
             value: user.address.isNotEmpty ? user.address : 'Chưa cập nhật',
           ),
           const Divider(
-               color: Colors.black87,
+            color: Colors.black87,
             thickness: 1,
             height: 1,
             indent: 16,
@@ -774,7 +774,7 @@ class _ProfileTab extends StatelessWidget {
             child: _ProfileDetailItem(icon: Icons.logout, value: 'Logout'),
           ),
           const Divider(
-               color: Colors.black87,
+            color: Colors.black87,
             thickness: 1,
             height: 1,
             indent: 16,
@@ -920,7 +920,11 @@ class _CachedFloatingActionButton extends StatelessWidget {
                 Stack(
                   children: [
                     _RequestOption(
-                      icon: Icons.event,
+                      image: SvgPicture.asset(
+                        'assets/image/leave.svg',
+                        width: 30,
+                        height: 30,
+                      ),
                       title: 'Xin nghỉ phép',
                       subtitle: 'Tạo đơn xin nghỉ phép',
                       color: const Color(0xFF4DD0FE),
@@ -938,7 +942,11 @@ class _CachedFloatingActionButton extends StatelessWidget {
                   ],
                 ),
                 _RequestOption(
-                  icon: Icons.access_time,
+                  image: SvgPicture.asset(
+                    'assets/image/log_work.svg',
+                    width: 50,
+                    height: 50,
+                  ),
                   title: 'Log work',
                   subtitle: 'Ghi nhận thời gian làm việc',
                   color: const Color(0xFF5B8DF6),
@@ -953,7 +961,11 @@ class _CachedFloatingActionButton extends StatelessWidget {
                   },
                 ),
                 _RequestOption(
-                  icon: Icons.edit,
+                  image: SvgPicture.asset(
+                    'assets/image/attended_aj.svg',
+                    width: 30,
+                    height: 30,
+                  ),
                   title: 'Điều chỉnh chấm công',
                   subtitle: 'Yêu cầu điều chỉnh thời gian',
                   color: const Color(0xFF3A7FF6),
@@ -969,7 +981,11 @@ class _CachedFloatingActionButton extends StatelessWidget {
                   },
                 ),
                 _RequestOption(
-                  icon: Icons.alarm,
+                  image: SvgPicture.asset(
+                    'assets/image/attended.svg',
+                    width: 30,
+                    height: 30,
+                  ),
                   title: 'Làm thêm giờ',
                   subtitle: 'Đăng ký làm thêm giờ',
                   color: const Color(0xFF0EC2F2),
@@ -995,14 +1011,14 @@ class _CachedFloatingActionButton extends StatelessWidget {
 
 // Widget cho request option trong bottom sheet
 class _RequestOption extends StatelessWidget {
-  final IconData icon;
+  final Widget image;
   final String title;
   final String subtitle;
   final Color color;
   final VoidCallback onTap;
 
   const _RequestOption({
-    required this.icon,
+    required this.image,
     required this.title,
     required this.subtitle,
     required this.color,
@@ -1027,13 +1043,13 @@ class _RequestOption extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 30,
+                  height: 30,
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, color: color, size: 24),
+                  child:image,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -1129,7 +1145,6 @@ class _ProposalButton extends StatelessWidget {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 16),
                     Text(
                       label,

@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:timesheet_project/features/user/domain/entities/user_entity.dart';
@@ -13,12 +16,13 @@ class UserCubit extends Cubit<UserState> {
   final UpdateUserUsecase _updateUserUsecase;
   final CheckUserExistsUsecase _checkUserExistsUsecase;
 
+
   UserCubit(
-    this._saveUserUsecase,
-    this._getUserUsecase,
-    this._updateUserUsecase,
-    this._checkUserExistsUsecase,
-  ) : super(UserInitial());
+      this._saveUserUsecase,
+      this._getUserUsecase,
+      this._updateUserUsecase,
+      this._checkUserExistsUsecase,
+      ) : super(UserInitial());
 
   Future<void> saveUser(UserEntity user) async {
     emit(UserLoading());
@@ -72,29 +76,28 @@ class UserCubit extends Cubit<UserState> {
     }
   }
 
+  // Future<void> updateUser(String uid, Map<String, dynamic> updates) async {
+  //   emit(UserLoading());
+  //   try {
+  //     final params = UpdateUserParams(uid: uid, updates: updates);
+  //     await _updateUserUsecase(params);
+  //
+  //     UserEntity? updatedUser = await _getUserUsecase(uid);
+  //     if (updatedUser != null) {
+  //       emit(UserLoaded(updatedUser));
+  //     }
+  //   } catch (e) {
+  //     emit(UserError('Lỗi cập nhật: $e'));
+  //   }
+  // }
   Future<void> updateUser(String uid, Map<String, dynamic> updates) async {
-    print('UserCubit: Starting updateUser for uid: $uid');
-    print('UserCubit: Updates: $updates');
-
     emit(UserLoading());
     try {
-      final params = UpdateUserParams(uid: uid, updates: updates);
-      print('UserCubit: Calling updateUserUsecase...');
-      await _updateUserUsecase(params);
-
-      print('UserCubit: Update successful! Emitting UserSaved...');
-      // Emit success first for SnackBar
-      emit(UserSaved('Đã cập nhật thông tin thành công!'));
-
-      print('UserCubit: Reloading user data...');
-      // Then reload user data for UI refresh
-      UserEntity? updatedUser = await _getUserUsecase(uid);
-      if (updatedUser != null) {
-        print('UserCubit: User data reloaded successfully');
-        emit(UserLoaded(updatedUser));
-      }
+      await _updateUserUsecase(UpdateUserParams(uid: uid, updates: updates));
+      emit(UserSaved('Đã cập nhật thành công!'));
+      final updatedUser = await _getUserUsecase(uid);
+      if (updatedUser != null) emit(UserLoaded(updatedUser));
     } catch (e) {
-      print('UserCubit: Update failed with error: $e');
       emit(UserError('Lỗi cập nhật: $e'));
     }
   }
@@ -102,4 +105,16 @@ class UserCubit extends Cubit<UserState> {
   void resetState() {
     emit(UserInitial());
   }
+  void setUser(UserEntity user) {
+    emit(UserLoaded(user));
+  }
+  void avatarChanged(File file) {
+    final currentState = state;
+    if (currentState is UserLoaded) {
+      emit(UserLoadedImage(currentState.user, file));
+    }
+  }
+
 }
+
+

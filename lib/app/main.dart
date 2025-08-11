@@ -1,10 +1,9 @@
+// import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:timesheet_project/core/firebase_options.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
 import 'package:timesheet_project/features/auth/presentation/pages/auth_wrapper.dart';
 import 'package:timesheet_project/di/di.dart';
 import 'package:timesheet_project/features/auth/presentation/cubit/auth_cubit.dart';
@@ -15,7 +14,11 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+
   await setupDependencyInjection();
+  await initializeDateFormatting('vi_VN', '');
+
   runApp(const MyApp());
 }
 
@@ -42,20 +45,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-// theme: ThemeData(
-//           scaffoldBackgroundColor: Color(0xFFF5F5F5),
-//           appBarTheme: AppBarTheme(
-//             backgroundColor: Colors.transparent,
-//             shadowColor: Colors.transparent,
-//             elevation: 0,
-//             surfaceTintColor: Colors.transparent,
-//           ),
-//           colorScheme: ColorScheme.light(
-//             primary: Colors.black,
-//             onPrimary: Colors.white,
-//             //secondary: Colors.grey,
-//           ),
-//           textTheme: TextTheme(
-//             bodyMedium: TextStyle(color: Colors.black),
-//           ),
-//         ),

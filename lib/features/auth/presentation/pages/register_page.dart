@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:timesheet_project/features/auth/data/repositories/auth_repository.dart';
+import 'package:timesheet_project/features/leave_request/presentation/pages/top_snackbar.dart';
 import 'package:timesheet_project/features/user/presentation/cubit/user_cubit.dart';
 import 'package:timesheet_project/features/auth/presentation/pages/sign_up_page.dart';
 import 'package:timesheet_project/features/attendance/presentation/pages/home_page.dart';
@@ -58,18 +59,13 @@ class _RegisterPageState extends State<RegisterPage> {
           }
         } else {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Đăng ký thất bại. Vui lòng thử lại.'),
-              ),
-            );
+            TopSnackbar.show(context,'Tài khoản email đã tồn tại.');
           }
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+          TopSnackbar.show(context,'Lỗi: $e');
+
         }
       } finally {
         if (mounted) {
@@ -81,40 +77,39 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  InputDecoration _inputDecoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: const TextStyle(
-        fontWeight: FontWeight.bold,
-        color: Color(0xFF0A357D),
-      ),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE6F0FF)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF0EC2F2), width: 2),
-      ),
-      fillColor: const Color(0xFFF7FAFF),
-      filled: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-    );
-  }
+  // InputDecoration _inputDecoration(String label) {
+  //   return InputDecoration(
+  //     labelText: label,
+  //     labelStyle: const TextStyle(
+  //       fontWeight: FontWeight.bold,
+  //       color: Color(0xFF0A357D),
+  //     ),
+  //     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+  //     enabledBorder: OutlineInputBorder(
+  //       borderRadius: BorderRadius.circular(12),
+  //       borderSide: const BorderSide(color: Color(0xFFE6F0FF)),
+  //     ),
+  //     focusedBorder: OutlineInputBorder(
+  //       borderRadius: BorderRadius.circular(12),
+  //       borderSide: const BorderSide(color: Color(0xFF0EC2F2), width: 2),
+  //     ),
+  //     fillColor: const Color(0xFFF7FAFF),
+  //     filled: true,
+  //     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FAFF),
+      backgroundColor: const Color(0xFF0957AE),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A357D),
-        title: const Text(
-          'Đăng ký tài khoản',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+        backgroundColor: const Color(0xFF0957AE),
         centerTitle: true,
         elevation: 0,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
       ),
       body: SafeArea(
         child: Center(
@@ -130,41 +125,100 @@ class _RegisterPageState extends State<RegisterPage> {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0A357D),
+                      color: Colors.white,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: _inputDecoration('User (Email)'),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Vui lòng nhập email';
-                      }
-                      final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
-                      if (!emailRegex.hasMatch(value.trim())) {
-                        return 'Email không hợp lệ';
-                      }
-                      return null;
-                    },
+                  SizedBox(
+                    width: 345,
+                    height: 300,
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Tên đăng nhập",style: TextStyle(fontWeight: FontWeight.bold),),
+                            SizedBox(height: 8,),
+                            // TextFormField(
+                            //   controller: _emailController,
+                            //   decoration: _inputDecoration('User (Email)'),
+                            //   keyboardType: TextInputType.emailAddress,
+                            //   validator: (value) {
+                            //     if (value == null || value.trim().isEmpty) {
+                            //       return 'Vui lòng nhập email';
+                            //     }
+                            //     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+                            //     if (!emailRegex.hasMatch(value.trim())) {
+                            //       return 'Email không hợp lệ';
+                            //     }
+                            //     return null;
+                            //   },
+                            // ),
+                            TextFormField(
+                              controller: _emailController,
+                              decoration: InputDecoration(
+                                labelText: 'User@gmail.com',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                prefixIcon: const Icon(Icons.email_outlined),
+                              ),
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Vui lòng nhập email';
+                                }
+                                final emailRegex =
+                                RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+                                if (!emailRegex.hasMatch(value.trim())) {
+                                  return 'Email không hợp lệ';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                            Text("Mật khẩu",style: TextStyle(fontWeight: FontWeight.bold),),
+                            SizedBox(height: 8,),
+                            // TextFormField(
+                            //   controller: _passwordController,
+                            //   decoration: _inputDecoration('Password'),
+                            //   obscureText: true,
+                            //   validator: (value) {
+                            //     if (value == null || value.trim().isEmpty) {
+                            //       return 'Vui lòng nhập mật khẩu';
+                            //     }
+                            //     if (value.length < 6) {
+                            //       return 'Mật khẩu phải có ít nhất 6 ký tự';
+                            //     }
+                            //     return null;
+                            //   },
+                            // ),
+                            TextFormField(
+                              controller: _passwordController,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                prefixIcon: const Icon(Icons.lock_outline),
+                              ),
+                              obscureText: true,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Vui lòng nhập mật khẩu';
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: _inputDecoration('Password'),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Vui lòng nhập mật khẩu';
-                      }
-                      if (value.length < 6) {
-                        return 'Mật khẩu phải có ít nhất 6 ký tự';
-                      }
-                      return null;
-                    },
-                  ),
+
                   const SizedBox(height: 32),
                   SizedBox(
                     width: double.infinity,
@@ -172,7 +226,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _register,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0A357D),
+                        backgroundColor: const Color(0xFF0EC2F2),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -181,7 +235,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : const Text(
-                              'Register',
+                              'Đăng ký',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,

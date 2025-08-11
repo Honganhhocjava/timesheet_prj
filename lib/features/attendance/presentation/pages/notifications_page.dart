@@ -4,6 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:timesheet_project/features/requests/presentation/pages/request_detail_page.dart';
 import 'package:timesheet_project/features/requests/presentation/pages/created_by_me_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:timesheet_project/features/user/presentation/cubit/user_cubit.dart';
+import 'package:timesheet_project/features/user/presentation/cubit/user_state.dart';
 
 class NotificationItem {
   final String id;
@@ -83,6 +86,10 @@ Future<List<NotificationItem>> fetchAllNotificationsForCurrentUser() async {
       .collection('attendance_adjustments')
       .where(fieldToQuery, isEqualTo: userId)
       .get();
+  final logworkDocs = await firestore
+      .collection('work_logs')
+      .where(fieldToQuery, isEqualTo: userId)
+      .get();
 
   final List<NotificationItem> notifications = [];
 
@@ -97,7 +104,7 @@ Future<List<NotificationItem>> fetchAllNotificationsForCurrentUser() async {
 
       if (!isManager) {
         if (status == 'pending') {
-          continue; // Skip pending requests for employees
+          continue;
         }
         debugPrint('DEBUG: Including non-pending request for employee');
       }
@@ -111,18 +118,18 @@ Future<List<NotificationItem>> fetchAllNotificationsForCurrentUser() async {
       if (isManager) {
         // Manager viewing requests sent to them - show sender info
         final senderInfo = await getUserInfo(senderId);
-        displayName =
-            ((senderInfo?['firstName'] ?? '')+ " " + (senderInfo?['lastName'] ?? ''))
-                .trim();
+        displayName = ((senderInfo?['firstName'] ?? '') +
+                " " +
+                (senderInfo?['lastName'] ?? ''))
+            .trim();
         avatarUrl = senderInfo?['avatarUrl'] ?? '';
         debugPrint('DEBUG: Manager view - showing sender: $displayName');
       } else {
         // Employee viewing their own requests - show manager info
         final managerInfo = await getUserInfo(managerId);
-        displayName =
-            ((managerInfo?['firstName'] ?? '') +
-                    (managerInfo?['lastName'] ?? ''))
-                .trim();
+        displayName = ((managerInfo?['firstName'] ?? '') +
+                (managerInfo?['lastName'] ?? ''))
+            .trim();
         avatarUrl = managerInfo?['avatarUrl'] ?? '';
         debugPrint('DEBUG: Employee view - showing manager: $displayName');
       }
@@ -190,6 +197,11 @@ Future<List<NotificationItem>> fetchAllNotificationsForCurrentUser() async {
     'attendance',
     'Đơn điều chỉnh chấm công',
   );
+  await addNotificationsFromDocs(
+    logworkDocs.docs,
+    'logworks',
+    'Nhật ý công việc',
+  );
 
   debugPrint('DEBUG: Total notifications found: ${notifications.length}');
 
@@ -224,56 +236,69 @@ class _NotificationsPageState extends State<NotificationsPage> {
         ),
         backgroundColor: const Color(0xFF0A357D),
       ),
-      body: FutureBuilder<List<NotificationItem>>(
-        future: _notificationsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+      body: BlocListener<UserCubit, UserState>(
+        listener: (context, state) {
+          if (state is UserSaved || state is UserLoaded) {
+            setState(() {
+              _notificationsFuture = fetchAllNotificationsForCurrentUser();
+            });
           }
-          if (snapshot.hasError) {
-            return Center(child: Text('Lỗi: ${snapshot.error}'));
-          }
-          final notifications = snapshot.data ?? [];
-          if (notifications.isEmpty) {
-            return const Center(child: Text('Chưa có thông báo nào'));
-          }
-          return ListView.separated(
-            itemCount: notifications.length,
-            padding: EdgeInsets.symmetric(vertical: 24),
-            itemBuilder: (context, index) {
-              final item = notifications[index];
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: item.senderAvatarUrl.isNotEmpty
-                      ? NetworkImage(item.senderAvatarUrl)
-                      : null,
-                  child: item.senderAvatarUrl.isEmpty
-                      ? Text(
-                          item.senderName.isNotEmpty ? item.senderName[0] : '?',
-                        )
-                      : null,
-                ),
-                title: Text(item.title),
-                subtitle: Text(
-                  '${item.senderName}  ${DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt)}',
-                ),
-                onTap: () async {
-                  final user = FirebaseAuth.instance.currentUser;
-                  final isManager = user != null && item.senderId != user.uid;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RequestDetailPage(
-                        request: item.toRequestItem(),
-                        isFromSentToMe: isManager,
-                      ),
-                    ),
-                  );
-                },
-              );
-            }, separatorBuilder: (BuildContext context, int index) => Divider(),
-          );
         },
+        child: FutureBuilder<List<NotificationItem>>(
+          future: _notificationsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text('Lỗi: ${snapshot.error}'));
+            }
+            final notifications = snapshot.data ?? [];
+            if (notifications.isEmpty) {
+              return const Center(child: Text('Chưa có thông báo nào'));
+            }
+            return ListView.separated(
+              itemCount: notifications.length,
+              padding: EdgeInsets.symmetric(vertical: 24),
+              itemBuilder: (context, index) {
+                final item = notifications[index];
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: item.senderAvatarUrl.isNotEmpty
+                        ? NetworkImage(item.senderAvatarUrl)
+                        : null,
+                    child: item.senderAvatarUrl.isEmpty
+                        ? Text(
+                            item.senderName.isNotEmpty
+                                ? item.senderName[0]
+                                : '?',
+                          )
+                        : null,
+                  ),
+                  title: Text(item.title),
+                  subtitle: Text(
+                    '${item.senderName}  ${DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt)}',
+                  ),
+                  onTap: () async {
+                    final user = FirebaseAuth.instance.currentUser;
+                    final isManager = user != null && item.senderId != user.uid;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RequestDetailPage(
+                          request: item.toRequestItem(),
+                          isFromSentToMe: isManager,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) =>
+                  const Divider(),
+            );
+          },
+        ),
       ),
     );
   }

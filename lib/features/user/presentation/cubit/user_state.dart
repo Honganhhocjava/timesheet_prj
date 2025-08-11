@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:timesheet_project/features/user/domain/entities/user_entity.dart';
 
 abstract class UserState {}
@@ -6,8 +8,17 @@ class UserInitial extends UserState {}
 
 class UserLoading extends UserState {}
 
+class UserLoadedImage extends UserState {
+  final UserEntity user;
+  File? avatarFile;
+
+
+  UserLoadedImage(this.user,this.avatarFile);
+
+}
 class UserLoaded extends UserState {
   final UserEntity user;
+
 
   UserLoaded(this.user);
 }
@@ -25,3 +36,13 @@ class UserError extends UserState {
 }
 
 class UserNotFound extends UserState {}
+
+class SetUser  extends UserState {
+  final UserEntity user;
+
+  SetUser(this.user);
+}
+
+
+
+

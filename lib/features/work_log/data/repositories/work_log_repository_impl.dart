@@ -78,4 +78,88 @@ class WorkLogRepositoryImpl implements WorkLogRepository {
       throw Exception('Failed to get managers: $e');
     }
   }
+
+  @override
+  Future<List<WorkLogEntity>> getWorkLogsByUser(String userId) async {
+    try {
+      final querySnapshot = await firestore
+          .collection('work_logs')
+          .where('idUser', isEqualTo: userId)
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => _jsonToEntity(doc.data()))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get work logs by user: $e');
+    }
+  }
+
+  @override
+  Future<List<WorkLogEntity>> getWorkLogsByManager(String managerId) async {
+    try {
+      final querySnapshot = await firestore
+          .collection('work_logs')
+          .where('idManager', isEqualTo: managerId)
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => _jsonToEntity(doc.data()))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get work logs by manager: $e');
+    }
+  }
+
+  WorkLogEntity _jsonToEntity(Map<String, dynamic> json) {
+    final activitiesLog = (json['activitiesLog'] as List<dynamic>?)
+            ?.map((log) => ActivityLog(
+                  id: log['id'],
+                  action: log['action'],
+                  userId: log['userId'],
+                  userRole: log['userRole'],
+                  timestamp: DateTime.parse(log['timestamp']),
+                  comment: log['comment'],
+                ))
+            .toList() ??
+        [];
+
+    return WorkLogEntity(
+      id: json['id'],
+      idUser: json['idUser'],
+      idManager: json['idManager'],
+      status: _stringToStatus(json['status']),
+      workDate: DateTime.parse(json['workDate']),
+      checkInTime: _stringToTime(json['checkInTime']),
+      checkOutTime: _stringToTime(json['checkOutTime']),
+      notes: json['notes'],
+      activitiesLog: activitiesLog,
+      createdAt: DateTime.parse(json['createdAt']),
+    );
+  }
+
+  WorkLogStatus _stringToStatus(String status) {
+    switch (status) {
+      case 'pending':
+        return WorkLogStatus.pending;
+      case 'approved':
+        return WorkLogStatus.approved;
+      case 'rejected':
+        return WorkLogStatus.rejected;
+      case 'cancelled':
+        return WorkLogStatus.cancelled;
+      default:
+        return WorkLogStatus.pending;
+    }
+  }
+
+  TimeOfDay _stringToTime(String time) {
+    final parts = time.split(':');
+    return TimeOfDay(
+      hour: int.parse(parts[0]),
+      minute: int.parse(parts[1]),
+    );
+  }
 }

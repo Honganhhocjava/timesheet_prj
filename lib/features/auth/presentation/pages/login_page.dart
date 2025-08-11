@@ -30,9 +30,9 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _login() async {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthCubit>().signIn(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
-      );
+            _emailController.text.trim(),
+            _passwordController.text.trim(),
+          );
     }
   }
 
@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF0957AE),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -69,66 +69,84 @@ class _LoginPageState extends State<LoginPage> {
                 if (state is AuthSuccess) {
                   _checkUserInfoAndNavigate(state.user.uid);
                 } else if (state is AuthError) {
-                  TopSnackbar.show(context,state.message);
+                  TopSnackbar.show(context, state.message);
                 }
-
               },
               child: Form(
                 key: _formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+
                   children: [
-                    //Image.asset('assets/Image/Logo.jpg', height: 20),
-                    const SizedBox(height: 32),
-                    const Text(
+                    Text('Login',
+                        style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white)),
+                    Text(
                       'WelCome To Your Account',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0A357D),
-                      ),
-                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14, color: Colors.white),
                     ),
-                    const SizedBox(height: 32.0),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: 'User',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    const SizedBox(height: 18.0),
+                    SizedBox(
+                      width: 345,
+                      height: 300,
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Tên đăng nhập",style: TextStyle(fontWeight: FontWeight.bold),),
+                              SizedBox(height: 8,),
+                              TextFormField(
+                                controller: _emailController,
+                                decoration: InputDecoration(
+                                  labelText: 'User@gmail.com',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  prefixIcon: const Icon(Icons.email_outlined),
+                                ),
+                                keyboardType: TextInputType.emailAddress,
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'Vui lòng nhập email';
+                                  }
+                                  final emailRegex =
+                                      RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+                                  if (!emailRegex.hasMatch(value.trim())) {
+                                    return 'Email không hợp lệ';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 20),
+                              Text("Mật khẩu",style: TextStyle(fontWeight: FontWeight.bold),),
+                              SizedBox(height: 8,),
+                              TextFormField(
+                                controller: _passwordController,
+                                decoration: InputDecoration(
+                                  labelText: 'Password',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  prefixIcon: const Icon(Icons.lock_outline),
+                                ),
+                                obscureText: true,
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'Vui lòng nhập mật khẩu';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                        prefixIcon: const Icon(Icons.email_outlined),
                       ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Vui lòng nhập email';
-                        }
-                        final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
-                        if (!emailRegex.hasMatch(value.trim())) {
-                          return 'Email không hợp lệ';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        prefixIcon: const Icon(Icons.lock_outline),
-                      ),
-                      obscureText: true,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Vui lòng nhập mật khẩu';
-                        }
-                        return null;
-                      },
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -144,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                             );
                           },
                           child: const Text(
-                            'Sign Up',
+                            'Đăng ký',
                             style: TextStyle(
                               color: Color(0xFF0EC2F2),
                               fontWeight: FontWeight.bold,
@@ -162,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
                           return ElevatedButton(
                             onPressed: state is AuthLoading ? null : _login,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF0A357D),
+                              backgroundColor: const  Color(0xFF0EC2F2),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -172,7 +190,7 @@ class _LoginPageState extends State<LoginPage> {
                                     color: Colors.white,
                                   )
                                 : const Text(
-                                    'Login',
+                                    'Đăng nhập',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,

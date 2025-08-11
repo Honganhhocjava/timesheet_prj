@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:timesheet_project/features/ai_assistant/pages/survey/survey_page.dart';
 
 class FloatingAIBall extends StatefulWidget {
@@ -136,19 +137,21 @@ class _FloatingAIBallState extends State<FloatingAIBall>
               scale: shouldShowPulse
                   ? 0.9 + (_pulseController.value * 0.2)
                   : 1.0,
-              child: Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFF00C7F2),
-                ),
-                child: const Icon(
-                  Icons.smart_toy_outlined,
-                  color: Colors.white,
-                  size: 32,
-                ),
-              ),
+              // child: Container(
+              //   width: 60,
+              //   height: 60,
+                // decoration: BoxDecoration(
+                //   shape: BoxShape.circle,
+                //   // color: Color(0xFF00C7F2),
+                //   color:const Color(0xFF0957AE),
+                // ),
+                // child: const Icon(
+                //   Icons.smart_toy_outlined,
+                //   color: Colors.white,
+                //   size: 32,
+                // ),
+                child : Lottie.asset('assets/image/chatbot.json',width:85,height: 85,fit: BoxFit.cover),
+             // ),
             );
           },
         ),

@@ -48,7 +48,6 @@ import 'package:timesheet_project/features/user/presentation/cubit/user_cubit.da
 import 'package:timesheet_project/features/leave_request/presentation/cubit/leave_request_cubit.dart';
 import 'package:timesheet_project/features/attendance_adjustment/presentation/cubit/attendance_adjustment_cubit.dart';
 import 'package:timesheet_project/features/overtime_request/presentation/cubit/overtime_request_cubit.dart';
-import 'package:timesheet_project/features/attendance/presentation/cubit/timesheets_cubit.dart';
 import 'package:timesheet_project/features/requests/presentation/cubit/requests_cubit.dart';
 import 'package:timesheet_project/features/work_log/presentation/cubit/work_log_cubit.dart';
 
@@ -57,7 +56,6 @@ import 'package:timesheet_project/features/attendance/domain/repositories/calend
 import 'package:timesheet_project/features/attendance/data/repositories/calendar_repository_impl.dart';
 import 'package:timesheet_project/features/attendance/domain/usecases/get_calendar_events_usecase.dart';
 import 'package:timesheet_project/features/attendance/domain/usecases/get_events_by_date_usecase.dart';
-
 
 final GetIt getIt = GetIt.instance;
 
@@ -162,7 +160,6 @@ Future<void> setupDependencyInjection() async {
     () => GetEventsByDateUseCase(getIt<CalendarRepository>()),
   );
 
-
   // Cubits
   getIt.registerFactory<AuthCubit>(() => AuthCubit(getIt<AuthRepository>()));
   getIt.registerFactory<UserCubit>(
@@ -194,18 +191,12 @@ Future<void> setupDependencyInjection() async {
       getIt<overtime_request.GetManagersUsecase>(),
     ),
   );
-  getIt.registerFactory<TimesheetsCubit>(
-    () => TimesheetsCubit(
-      getIt<LeaveRequestRepository>(),
-      getIt<AttendanceAdjustmentRepository>(),
-      getIt<OvertimeRequestRepository>(),
-    ),
-  );
   getIt.registerFactory<RequestsCubit>(
     () => RequestsCubit(
       getIt<LeaveRequestRepository>(),
       getIt<AttendanceAdjustmentRepository>(),
       getIt<OvertimeRequestRepository>(),
+      getIt<WorkLogRepository>(),
       getIt<UserRepository>(),
     ),
   );
