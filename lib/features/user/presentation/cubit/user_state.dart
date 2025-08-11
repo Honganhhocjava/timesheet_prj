@@ -12,13 +12,11 @@ class UserLoadedImage extends UserState {
   final UserEntity user;
   File? avatarFile;
 
-
-  UserLoadedImage(this.user,this.avatarFile);
-
+  UserLoadedImage(this.user, this.avatarFile);
 }
+
 class UserLoaded extends UserState {
   final UserEntity user;
-
 
   UserLoaded(this.user);
 }
@@ -37,12 +35,8 @@ class UserError extends UserState {
 
 class UserNotFound extends UserState {}
 
-class SetUser  extends UserState {
+class SetUser extends UserState {
   final UserEntity user;
 
   SetUser(this.user);
 }
-
-
-
-

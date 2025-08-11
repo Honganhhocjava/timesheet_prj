@@ -1,6 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/material.dart';
 import 'package:timesheet_project/features/overtime_request/domain/entities/overtime_request_entity.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
+import 'package:timesheet_project/core/converters/request_converters.dart';
 
 part 'overtime_request_model.freezed.dart';
 part 'overtime_request_model.g.dart';
@@ -11,7 +13,7 @@ class OvertimeRequestModel with _$OvertimeRequestModel {
     required String id,
     required String idUser,
     required String idManager,
-    required String status,
+    @RequestStatusConverter() required RequestStatus status,
     required DateTime overtimeDate,
     required String startTime,
     required String endTime,
@@ -30,7 +32,7 @@ extension OvertimeRequestModelX on OvertimeRequestModel {
       id: id,
       idUser: idUser,
       idManager: idManager,
-      status: _stringToStatus(status),
+      status: status,
       overtimeDate: overtimeDate,
       startTime: _stringToTimeOfDay(startTime),
       endTime: _stringToTimeOfDay(endTime),
@@ -45,7 +47,7 @@ extension OvertimeRequestModelX on OvertimeRequestModel {
       id: entity.id,
       idUser: entity.idUser,
       idManager: entity.idManager,
-      status: _statusToString(entity.status),
+      status: entity.status,
       overtimeDate: entity.overtimeDate,
       startTime: _timeOfDayToString(entity.startTime),
       endTime: _timeOfDayToString(entity.endTime),
@@ -66,35 +68,15 @@ extension OvertimeRequestModelX on OvertimeRequestModel {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
-  static OvertimeRequestStatus _stringToStatus(String status) {
-    switch (status) {
-      case 'pending':
-        return OvertimeRequestStatus.pending;
-      case 'approved':
-        return OvertimeRequestStatus.approved;
-      case 'rejected':
-        return OvertimeRequestStatus.rejected;
-      case 'cancelled':
-        return OvertimeRequestStatus.cancelled;
-      default:
-        return OvertimeRequestStatus.pending;
-    }
+  static RequestStatus _stringToStatus(String status) {
+    return status.toRequestStatus();
   }
 
-  static String _statusToString(OvertimeRequestStatus status) {
-    switch (status) {
-      case OvertimeRequestStatus.pending:
-        return 'pending';
-      case OvertimeRequestStatus.approved:
-        return 'approved';
-      case OvertimeRequestStatus.rejected:
-        return 'rejected';
-      case OvertimeRequestStatus.cancelled:
-        return 'cancelled';
-    }
+  static String _statusToString(RequestStatus status) {
+    return status.toStringValue();
   }
 
-  static String statusToString(OvertimeRequestStatus status) {
+  static String statusToString(RequestStatus status) {
     return _statusToString(status);
   }
 }

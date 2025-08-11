@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 
 class AttendanceAdjustmentEntity {
   final String id;
   final String idUser;
   final String idManager;
-  final AttendanceAdjustmentStatus status;
+  final RequestStatus status;
   final DateTime adjustmentDate;
   final TimeOfDay originalCheckIn;
   final TimeOfDay originalCheckOut;
@@ -33,7 +34,7 @@ class AttendanceAdjustmentEntity {
     String? id,
     String? idUser,
     String? idManager,
-    AttendanceAdjustmentStatus? status,
+    RequestStatus? status,
     DateTime? adjustmentDate,
     TimeOfDay? originalCheckIn,
     TimeOfDay? originalCheckOut,
@@ -59,8 +60,6 @@ class AttendanceAdjustmentEntity {
     );
   }
 }
-
-enum AttendanceAdjustmentStatus { pending, approved, rejected, cancelled }
 
 class ActivityLog {
   final String id;

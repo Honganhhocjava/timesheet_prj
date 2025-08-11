@@ -57,6 +57,13 @@ import 'package:timesheet_project/features/attendance/data/repositories/calendar
 import 'package:timesheet_project/features/attendance/domain/usecases/get_calendar_events_usecase.dart';
 import 'package:timesheet_project/features/attendance/domain/usecases/get_events_by_date_usecase.dart';
 
+// Notification imports
+import 'package:timesheet_project/features/attendance/domain/repositories/notification_repository.dart';
+import 'package:timesheet_project/features/attendance/data/repositories/notification_repository_impl.dart';
+import 'package:timesheet_project/features/attendance/domain/usecases/create_notification_usecase.dart';
+import 'package:timesheet_project/features/attendance/domain/usecases/create_request_notification_usecase.dart';
+import 'package:timesheet_project/features/attendance/domain/usecases/get_notifications_by_user_usecase.dart';
+
 final GetIt getIt = GetIt.instance;
 
 Future<void> setupDependencyInjection() async {
@@ -83,7 +90,7 @@ Future<void> setupDependencyInjection() async {
 
   // Leave Request Repository - Interface and Implementation
   getIt.registerLazySingleton<LeaveRequestRepository>(
-    () => LeaveRequestRepositoryImpl(),
+    () => LeaveRequestRepositoryImpl(getIt<CreateRequestNotificationUsecase>()),
   );
 
   // Leave Request Usecases
@@ -102,7 +109,8 @@ Future<void> setupDependencyInjection() async {
 
   // Attendance Adjustment Repository - Interface and Implementation
   getIt.registerLazySingleton<AttendanceAdjustmentRepository>(
-    () => AttendanceAdjustmentRepositoryImpl(),
+    () => AttendanceAdjustmentRepositoryImpl(
+        getIt<CreateRequestNotificationUsecase>()),
   );
 
   // Attendance Adjustment Usecases
@@ -119,7 +127,8 @@ Future<void> setupDependencyInjection() async {
 
   // Overtime Request Repository - Interface and Implementation
   getIt.registerLazySingleton<OvertimeRequestRepository>(
-    () => OvertimeRequestRepositoryImpl(),
+    () => OvertimeRequestRepositoryImpl(
+        getIt<CreateRequestNotificationUsecase>()),
   );
 
   // Overtime Request Usecases
@@ -136,7 +145,8 @@ Future<void> setupDependencyInjection() async {
 
   // Work Log Repository - Interface and Implementation
   getIt.registerLazySingleton<WorkLogRepository>(
-    () => WorkLogRepositoryImpl(FirebaseFirestore.instance),
+    () => WorkLogRepositoryImpl(
+        FirebaseFirestore.instance, getIt<CreateRequestNotificationUsecase>()),
   );
 
   // Work Log Usecases
@@ -158,6 +168,22 @@ Future<void> setupDependencyInjection() async {
   );
   getIt.registerLazySingleton<GetEventsByDateUseCase>(
     () => GetEventsByDateUseCase(getIt<CalendarRepository>()),
+  );
+
+  // Notification Repository - Interface and Implementation
+  getIt.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(),
+  );
+
+  // Notification Usecases
+  getIt.registerLazySingleton<CreateNotificationUsecase>(
+    () => CreateNotificationUsecase(getIt<NotificationRepository>()),
+  );
+  getIt.registerLazySingleton<CreateRequestNotificationUsecase>(
+    () => CreateRequestNotificationUsecase(getIt<NotificationRepository>()),
+  );
+  getIt.registerLazySingleton<GetNotificationsByUserUsecase>(
+    () => GetNotificationsByUserUsecase(getIt<NotificationRepository>()),
   );
 
   // Cubits

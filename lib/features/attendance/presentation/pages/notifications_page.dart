@@ -1,212 +1,27 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:timesheet_project/features/requests/presentation/pages/request_detail_page.dart';
 import 'package:timesheet_project/features/requests/presentation/pages/created_by_me_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:timesheet_project/features/user/presentation/cubit/user_cubit.dart';
 import 'package:timesheet_project/features/user/presentation/cubit/user_state.dart';
+import 'package:timesheet_project/di/di.dart';
+import 'package:timesheet_project/features/attendance/domain/usecases/get_notifications_by_user_usecase.dart';
+import 'package:timesheet_project/features/attendance/domain/entities/notification_entity.dart';
+import 'package:timesheet_project/core/usecases/usecase.dart';
 
-class NotificationItem {
-  final String id;
-  final String type; // 'leave', 'overtime', 'attendance', 'worklog'
-  final String senderId;
-  final String senderName;
-  final String senderAvatarUrl;
-  final String title; // Tên loại đơn
-  final DateTime createdAt;
-  final String status; // pending/approved/rejected/cancelled
-  final String reason;
-  final DateTime? startDate;
-  final DateTime? endDate;
-  final DateTime? adjustmentDate;
-  final DateTime? overtimeDate;
+// Sử dụng NotificationEntity thay vì NotificationItem
 
-  NotificationItem({
-    required this.id,
-    required this.type,
-    required this.senderId,
-    required this.senderName,
-    required this.senderAvatarUrl,
-    required this.title,
-    required this.createdAt,
-    required this.status,
-    required this.reason,
-    this.startDate,
-    this.endDate,
-    this.adjustmentDate,
-    this.overtimeDate,
-  });
-
-  RequestItem toRequestItem() {
-    return RequestItem(
-      id: id,
-      userName: senderName,
-      reason: reason,
-      status: status,
-      createdAt: createdAt,
-      requestType: type,
-      startDate: startDate,
-      endDate: endDate,
-      adjustmentDate: adjustmentDate,
-      overtimeDate: overtimeDate,
-    );
+Future<List<NotificationEntity>> fetchAllNotificationsForCurrentUser() async {
+  try {
+    final getNotificationsUsecase = getIt<GetNotificationsByUserUsecase>();
+    final notifications = await getNotificationsUsecase(NoParams());
+    return notifications;
+  } catch (e) {
+    print('Error fetching notifications: $e');
+    return [];
   }
-}
-
-Future<List<NotificationItem>> fetchAllNotificationsForCurrentUser() async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) return [];
-  final userId = user.uid;
-  final firestore = FirebaseFirestore.instance;
-
-  final userDoc = await firestore.collection('users').doc(userId).get();
-  final userData = userDoc.data();
-  final userRole = userData?['role'] ?? 'Nhân viên';
-
-  // Determine if user is manager or employee
-  final isManager = userRole == 'Quản lý';
-  final fieldToQuery = isManager ? 'idManager' : 'idUser';
-
-  Future<Map<String, dynamic>?> getUserInfo(String userId) async {
-    final doc = await firestore.collection('users').doc(userId).get();
-    return doc.data();
-  }
-
-  final leaveDocs = await firestore
-      .collection('leave_requests')
-      .where(fieldToQuery, isEqualTo: userId)
-      .get();
-  final overtimeDocs = await firestore
-      .collection('overtime_requests')
-      .where(fieldToQuery, isEqualTo: userId)
-      .get();
-  final attendanceDocs = await firestore
-      .collection('attendance_adjustments')
-      .where(fieldToQuery, isEqualTo: userId)
-      .get();
-  final logworkDocs = await firestore
-      .collection('work_logs')
-      .where(fieldToQuery, isEqualTo: userId)
-      .get();
-
-  final List<NotificationItem> notifications = [];
-
-  Future<void> addNotificationsFromDocs(
-    List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
-    String type,
-    String title,
-  ) async {
-    for (final doc in docs) {
-      final data = doc.data();
-      final status = data['status'] ?? 'pending';
-
-      if (!isManager) {
-        if (status == 'pending') {
-          continue;
-        }
-        debugPrint('DEBUG: Including non-pending request for employee');
-      }
-
-      final senderId = data['idUser'] ?? '';
-      final managerId = data['idManager'] ?? '';
-
-      // Get user info based on role
-      String displayName;
-      String avatarUrl;
-      if (isManager) {
-        // Manager viewing requests sent to them - show sender info
-        final senderInfo = await getUserInfo(senderId);
-        displayName = ((senderInfo?['firstName'] ?? '') +
-                " " +
-                (senderInfo?['lastName'] ?? ''))
-            .trim();
-        avatarUrl = senderInfo?['avatarUrl'] ?? '';
-        debugPrint('DEBUG: Manager view - showing sender: $displayName');
-      } else {
-        // Employee viewing their own requests - show manager info
-        final managerInfo = await getUserInfo(managerId);
-        displayName = ((managerInfo?['firstName'] ?? '') +
-                (managerInfo?['lastName'] ?? ''))
-            .trim();
-        avatarUrl = managerInfo?['avatarUrl'] ?? '';
-        debugPrint('DEBUG: Employee view - showing manager: $displayName');
-      }
-
-      // Parse dates based on type
-      DateTime? startDate, endDate, adjustmentDate, overtimeDate;
-      if (type == 'leave') {
-        startDate = DateTime.tryParse(data['startDate'] ?? '');
-        endDate = DateTime.tryParse(data['endDate'] ?? '');
-      } else if (type == 'attendance') {
-        adjustmentDate = DateTime.tryParse(data['adjustmentDate'] ?? '');
-      } else if (type == 'overtime') {
-        overtimeDate = DateTime.tryParse(data['overtimeDate'] ?? '');
-      }
-
-      // Tạo title với trạng thái
-      String statusText;
-      switch (status) {
-        case 'approved':
-          statusText = 'đã duyệt';
-          break;
-        case 'rejected':
-          statusText = 'đã từ chối';
-          break;
-        case 'cancelled':
-          statusText = 'đã hủy';
-          break;
-        default:
-          statusText = 'chờ duyệt';
-      }
-
-      final titleWithStatus = '$title $statusText';
-
-      notifications.add(
-        NotificationItem(
-          id: doc.id,
-          type: type,
-          senderId: isManager ? senderId : managerId,
-          senderName: displayName,
-          senderAvatarUrl: avatarUrl,
-          title: titleWithStatus,
-          createdAt:
-              DateTime.tryParse(data['createdAt'] ?? '') ?? DateTime.now(),
-          status: status,
-          reason: data['reason'] ?? '',
-          startDate: startDate,
-          endDate: endDate,
-          adjustmentDate: adjustmentDate,
-          overtimeDate: overtimeDate,
-        ),
-      );
-
-      debugPrint('DEBUG: Added notification for $type request');
-    }
-  }
-
-  await addNotificationsFromDocs(leaveDocs.docs, 'leave', 'Đơn nghỉ phép');
-  await addNotificationsFromDocs(
-    overtimeDocs.docs,
-    'overtime',
-    'Đơn làm thêm giờ',
-  );
-  await addNotificationsFromDocs(
-    attendanceDocs.docs,
-    'attendance',
-    'Đơn điều chỉnh chấm công',
-  );
-  await addNotificationsFromDocs(
-    logworkDocs.docs,
-    'logworks',
-    'Nhật ý công việc',
-  );
-
-  debugPrint('DEBUG: Total notifications found: ${notifications.length}');
-
-  notifications.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-  return notifications;
 }
 
 class NotificationsPage extends StatefulWidget {
@@ -217,7 +32,7 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  late Future<List<NotificationItem>> _notificationsFuture;
+  late Future<List<NotificationEntity>> _notificationsFuture;
 
   @override
   void initState() {
@@ -244,7 +59,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
             });
           }
         },
-        child: FutureBuilder<List<NotificationItem>>(
+        child: FutureBuilder<List<NotificationEntity>>(
           future: _notificationsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -259,15 +74,15 @@ class _NotificationsPageState extends State<NotificationsPage> {
             }
             return ListView.separated(
               itemCount: notifications.length,
-              padding: EdgeInsets.symmetric(vertical: 24),
+              padding: const EdgeInsets.symmetric(vertical: 24),
               itemBuilder: (context, index) {
                 final item = notifications[index];
                 return ListTile(
                   leading: CircleAvatar(
-                    backgroundImage: item.senderAvatarUrl.isNotEmpty
-                        ? NetworkImage(item.senderAvatarUrl)
+                    backgroundImage: item.senderAvatar.isNotEmpty
+                        ? NetworkImage(item.senderAvatar)
                         : null,
-                    child: item.senderAvatarUrl.isEmpty
+                    child: item.senderAvatar.isEmpty
                         ? Text(
                             item.senderName.isNotEmpty
                                 ? item.senderName[0]

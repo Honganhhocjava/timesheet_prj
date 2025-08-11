@@ -9,7 +9,9 @@ import 'package:timesheet_project/features/overtime_request/domain/repositories/
 import 'package:timesheet_project/features/overtime_request/domain/entities/overtime_request_entity.dart';
 import 'package:timesheet_project/features/attendance_adjustment/domain/repositories/attendance_adjustment_repository.dart';
 import 'package:timesheet_project/features/attendance_adjustment/domain/entities/attendance_adjustment_entity.dart';
-
+import 'package:timesheet_project/features/work_log/domain/repositories/work_log_repository.dart';
+import 'package:timesheet_project/features/work_log/domain/entities/work_log_entity.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 
 class RequestDetailPage extends StatefulWidget {
   final RequestItem request;
@@ -35,6 +37,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
   LeaveRequestEntity? _leaveRequest;
   OvertimeRequestEntity? _overtimeRequest;
   AttendanceAdjustmentEntity? _attendanceAdjustment;
+  WorkLogEntity? _workLog;
 
   @override
   void initState() {
@@ -63,6 +66,9 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
         _attendanceAdjustment = await repository.getAttendanceAdjustmentById(
           widget.request.id,
         );
+      } else if (widget.request.isWorkLog) {
+        final repository = getIt<WorkLogRepository>();
+        _workLog = await repository.getWorkLogById(widget.request.id);
       }
     } catch (e) {
       TopSnackbar.show(context, 'Lỗi khi tải thông tin chi tiết: $e');
@@ -77,11 +83,9 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isManager =
-        widget.isFromSentToMe &&
+    final isManager = widget.isFromSentToMe &&
         widget.request.status.toLowerCase() == 'pending';
-    final isCreator =
-        !widget.isFromSentToMe &&
+    final isCreator = !widget.isFromSentToMe &&
         widget.request.status.toLowerCase() == 'pending';
 
     return Scaffold(
@@ -432,7 +436,6 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
             Icons.person,
             'Người gửi đơn',
             widget.request.userName,
-
           )
         else
           _buildDetailRow(Icons.work, 'Người quản lý', widget.request.userName),
@@ -580,21 +583,28 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
         final repository = getIt<LeaveRequestRepository>();
         await repository.updateLeaveRequestStatus(
           widget.request.id,
-          LeaveRequestStatus.approved,
+          RequestStatus.approved,
           null,
         );
       } else if (widget.request.isOvertimeRequest) {
         final repository = getIt<OvertimeRequestRepository>();
         await repository.updateOvertimeRequestStatus(
           widget.request.id,
-          OvertimeRequestStatus.approved,
+          RequestStatus.approved,
           null,
         );
       } else if (widget.request.isAttendanceAdjustment) {
         final repository = getIt<AttendanceAdjustmentRepository>();
         await repository.updateAttendanceAdjustmentStatus(
           widget.request.id,
-          AttendanceAdjustmentStatus.approved,
+          RequestStatus.approved,
+          null,
+        );
+      } else if (widget.request.isWorkLog) {
+        final repository = getIt<WorkLogRepository>();
+        await repository.updateWorkLogStatus(
+          widget.request.id,
+          RequestStatus.approved,
           null,
         );
       }
@@ -657,21 +667,28 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
         final repository = getIt<LeaveRequestRepository>();
         await repository.updateLeaveRequestStatus(
           widget.request.id,
-          LeaveRequestStatus.rejected,
+          RequestStatus.rejected,
           reason,
         );
       } else if (widget.request.isOvertimeRequest) {
         final repository = getIt<OvertimeRequestRepository>();
         await repository.updateOvertimeRequestStatus(
           widget.request.id,
-          OvertimeRequestStatus.rejected,
+          RequestStatus.rejected,
           reason,
         );
       } else if (widget.request.isAttendanceAdjustment) {
         final repository = getIt<AttendanceAdjustmentRepository>();
         await repository.updateAttendanceAdjustmentStatus(
           widget.request.id,
-          AttendanceAdjustmentStatus.rejected,
+          RequestStatus.rejected,
+          reason,
+        );
+      } else if (widget.request.isWorkLog) {
+        final repository = getIt<WorkLogRepository>();
+        await repository.updateWorkLogStatus(
+          widget.request.id,
+          RequestStatus.rejected,
           reason,
         );
       }
@@ -685,7 +702,6 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
       setState(() => _isProcessing = false);
     }
   }
-
 
   void _handleCancel() async {
     final confirmed = await showDialog<bool>(
@@ -716,21 +732,21 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
           final repository = getIt<LeaveRequestRepository>();
           await repository.updateLeaveRequestStatus(
             widget.request.id,
-            LeaveRequestStatus.cancelled,
+            RequestStatus.cancelled,
             null,
           );
         } else if (widget.request.isOvertimeRequest) {
           final repository = getIt<OvertimeRequestRepository>();
           await repository.updateOvertimeRequestStatus(
             widget.request.id,
-            OvertimeRequestStatus.cancelled,
+            RequestStatus.cancelled,
             null,
           );
         } else if (widget.request.isAttendanceAdjustment) {
           final repository = getIt<AttendanceAdjustmentRepository>();
           await repository.updateAttendanceAdjustmentStatus(
             widget.request.id,
-            AttendanceAdjustmentStatus.cancelled,
+            RequestStatus.cancelled,
             null,
           );
         }
@@ -748,8 +764,8 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
   String _getDateRange() {
     if (widget.request.isLeaveRequest && widget.request.startDate != null) {
       if (widget.request.endDate != null) {
-        final isSameDay =
-            widget.request.startDate!.year == widget.request.endDate!.year &&
+        final isSameDay = widget.request.startDate!.year ==
+                widget.request.endDate!.year &&
             widget.request.startDate!.month == widget.request.endDate!.month &&
             widget.request.startDate!.day == widget.request.endDate!.day;
 

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:timesheet_project/features/ai_assistant/data/models/question_models.dart';
 
-
 abstract class GeminiRemote {
   Future<List<QuestionModel>> generateSurvey();
 
@@ -18,12 +17,12 @@ class GeminiRemoteImpl implements GeminiRemote {
     const url =
         'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
-      final prompt = {
-        "contents": [
-          {
-            "parts": [
-              {
-                "text": """
+    final prompt = {
+      "contents": [
+        {
+          "parts": [
+            {
+              "text": """
   Hãy tạo 10 câu hỏi trắc nghiệm cho một bài khảo sát về cảm xúc của nhân viên khi đi làm của nhân viên trong tuần , định dạng dưới dạng JSON như sau:
   [
     {
@@ -35,7 +34,7 @@ class GeminiRemoteImpl implements GeminiRemote {
   ]
   Chỉ trả về JSON đúng định dạng trên, không có văn bản mô tả thêm.
   """
-              }
+            }
           ]
         }
       ]
@@ -49,7 +48,7 @@ class GeminiRemoteImpl implements GeminiRemote {
 
     final raw = response.data['candidates'][0]['content']['parts'][0]['text'];
     final cleanedRaw =
-    raw.replaceAll('```json', '').replaceAll('```', '').trim();
+        raw.replaceAll('```json', '').replaceAll('```', '').trim();
     final List<dynamic> jsonList = jsonDecode(cleanedRaw);
 
     return jsonList

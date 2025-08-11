@@ -1,20 +1,43 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:timesheet_project/features/work_log/domain/entities/work_log_entity.dart';
 import 'package:timesheet_project/features/work_log/domain/repositories/work_log_repository.dart';
 import 'package:timesheet_project/features/user/domain/entities/user_entity.dart';
 import 'package:timesheet_project/features/user/data/models/user_model.dart';
+import 'package:timesheet_project/features/attendance/domain/usecases/create_request_notification_usecase.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 
 class WorkLogRepositoryImpl implements WorkLogRepository {
   final FirebaseFirestore firestore;
+  final CreateRequestNotificationUsecase? _createNotificationUsecase;
 
-  WorkLogRepositoryImpl(this.firestore);
+  WorkLogRepositoryImpl(this.firestore, [this._createNotificationUsecase]);
 
   @override
   Future<void> createWorkLog(WorkLogEntity workLog) async {
     try {
       final workLogData = _entityToJson(workLog);
       await firestore.collection('work_logs').doc(workLog.id).set(workLogData);
+
+      // Tạo notification cho manager
+      if (_createNotificationUsecase != null) {
+        try {
+          await _createNotificationUsecase!.call(
+            CreateRequestNotificationParams(
+              requestId: workLog.id,
+              requestType: RequestType.worklog,
+              status: RequestStatus.pending,
+              userId: workLog.idUser,
+              managerId: workLog.idManager,
+              action: NotificationAction.create,
+            ),
+          );
+        } catch (e) {
+          print('DEBUG: Error creating notification: $e');
+          // Không throw exception vì việc tạo notification không ảnh hưởng đến việc tạo đơn
+        }
+      }
     } catch (e) {
       throw Exception('Failed to create work log: $e');
     }
@@ -46,17 +69,8 @@ class WorkLogRepositoryImpl implements WorkLogRepository {
     };
   }
 
-  String _statusToString(WorkLogStatus status) {
-    switch (status) {
-      case WorkLogStatus.pending:
-        return 'pending';
-      case WorkLogStatus.approved:
-        return 'approved';
-      case WorkLogStatus.rejected:
-        return 'rejected';
-      case WorkLogStatus.cancelled:
-        return 'cancelled';
-    }
+  String _statusToString(RequestStatus status) {
+    return status.toStringValue();
   }
 
   String _timeToString(TimeOfDay time) {
@@ -113,6 +127,20 @@ class WorkLogRepositoryImpl implements WorkLogRepository {
     }
   }
 
+  @override
+  Future<WorkLogEntity?> getWorkLogById(String id) async {
+    try {
+      final docSnapshot = await firestore.collection('work_logs').doc(id).get();
+
+      if (docSnapshot.exists) {
+        return _jsonToEntity(docSnapshot.data()!);
+      }
+      return null;
+    } catch (e) {
+      throw Exception('Failed to get work log by id: $e');
+    }
+  }
+
   WorkLogEntity _jsonToEntity(Map<String, dynamic> json) {
     final activitiesLog = (json['activitiesLog'] as List<dynamic>?)
             ?.map((log) => ActivityLog(
@@ -140,19 +168,8 @@ class WorkLogRepositoryImpl implements WorkLogRepository {
     );
   }
 
-  WorkLogStatus _stringToStatus(String status) {
-    switch (status) {
-      case 'pending':
-        return WorkLogStatus.pending;
-      case 'approved':
-        return WorkLogStatus.approved;
-      case 'rejected':
-        return WorkLogStatus.rejected;
-      case 'cancelled':
-        return WorkLogStatus.cancelled;
-      default:
-        return WorkLogStatus.pending;
-    }
+  RequestStatus _stringToStatus(String status) {
+    return status.toRequestStatus();
   }
 
   TimeOfDay _stringToTime(String time) {
@@ -161,5 +178,68 @@ class WorkLogRepositoryImpl implements WorkLogRepository {
       hour: int.parse(parts[0]),
       minute: int.parse(parts[1]),
     );
+  }
+
+  @override
+  Future<void> updateWorkLogStatus(
+      String id, RequestStatus status, String? comment) async {
+    try {
+      final docRef = firestore.collection('work_logs').doc(id);
+
+      // Get current document to update activities log
+      final docSnapshot = await docRef.get();
+      if (!docSnapshot.exists) {
+        throw Exception('Không tìm thấy work log');
+      }
+
+      final currentData = docSnapshot.data()!;
+
+      // Get current user for activity log
+      final currentUser = FirebaseAuth.instance.currentUser;
+      final userId = currentUser?.uid ?? 'unknown';
+
+      // Create new activity as JSON directly
+      final newActivityJson = {
+        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+        'action': 'Status updated to ${status.toString().split('.').last}',
+        'userId': userId,
+        'userRole': 'Quản lý',
+        'timestamp': DateTime.now().toIso8601String(),
+        'comment': comment,
+      };
+
+      // Get current activities log as JSON list
+      final currentActivitiesLog =
+          currentData['activitiesLog'] as List<dynamic>? ?? [];
+
+      // Add new activity to the list
+      final updatedActivitiesLog = [...currentActivitiesLog, newActivityJson];
+
+      await docRef.update({
+        'status': _statusToString(status),
+        'activitiesLog': updatedActivitiesLog,
+      });
+
+      // Tạo notification cho user khi duyệt đơn
+      if (_createNotificationUsecase != null) {
+        try {
+          await _createNotificationUsecase!.call(
+            CreateRequestNotificationParams(
+              requestId: id,
+              requestType: RequestType.worklog,
+              status: status,
+              userId: currentData['idUser'] ?? '',
+              managerId: currentData['idManager'] ?? '',
+              action: NotificationAction.approve,
+            ),
+          );
+        } catch (e) {
+          print('DEBUG: Error creating notification: $e');
+          // Không throw exception vì việc tạo notification không ảnh hưởng đến việc duyệt đơn
+        }
+      }
+    } catch (e) {
+      throw Exception('Lỗi khi cập nhật trạng thái work log: $e');
+    }
   }
 }

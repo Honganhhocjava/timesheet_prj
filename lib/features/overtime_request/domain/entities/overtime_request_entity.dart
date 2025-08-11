@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 
 class OvertimeRequestEntity {
   final String id;
   final String idUser;
   final String idManager;
-  final OvertimeRequestStatus status;
+  final RequestStatus status;
   final DateTime overtimeDate;
   final TimeOfDay startTime;
   final TimeOfDay endTime;
@@ -29,7 +30,7 @@ class OvertimeRequestEntity {
     String? id,
     String? idUser,
     String? idManager,
-    OvertimeRequestStatus? status,
+    RequestStatus? status,
     DateTime? overtimeDate,
     TimeOfDay? startTime,
     TimeOfDay? endTime,
@@ -51,8 +52,6 @@ class OvertimeRequestEntity {
     );
   }
 }
-
-enum OvertimeRequestStatus { pending, approved, rejected, cancelled }
 
 class ActivityLog {
   final String id;

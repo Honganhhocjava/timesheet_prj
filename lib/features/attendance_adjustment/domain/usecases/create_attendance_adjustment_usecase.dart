@@ -3,6 +3,7 @@ import 'package:timesheet_project/core/usecases/usecase.dart';
 import 'package:timesheet_project/features/attendance_adjustment/domain/entities/attendance_adjustment_entity.dart';
 import 'package:timesheet_project/features/attendance_adjustment/domain/repositories/attendance_adjustment_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 
 class CreateAttendanceAdjustmentUsecase
     implements UseCase<void, CreateAttendanceAdjustmentParams> {
@@ -30,7 +31,7 @@ class CreateAttendanceAdjustmentUsecase
       id: params.id,
       idUser: currentUser.uid,
       idManager: params.idManager,
-      status: AttendanceAdjustmentStatus.pending,
+      status: RequestStatus.pending,
       adjustmentDate: params.adjustmentDate,
       originalCheckIn: params.originalCheckIn,
       originalCheckOut: params.originalCheckOut,

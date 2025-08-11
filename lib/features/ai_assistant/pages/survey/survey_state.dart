@@ -25,9 +25,9 @@ class SurveyError extends SurveyState {
 
   SurveyError(this.message);
 }
+
 class SurveyResult extends SurveyState {
   final String feedback;
 
   SurveyResult(this.feedback);
 }
-

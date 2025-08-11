@@ -16,13 +16,12 @@ class UserCubit extends Cubit<UserState> {
   final UpdateUserUsecase _updateUserUsecase;
   final CheckUserExistsUsecase _checkUserExistsUsecase;
 
-
   UserCubit(
-      this._saveUserUsecase,
-      this._getUserUsecase,
-      this._updateUserUsecase,
-      this._checkUserExistsUsecase,
-      ) : super(UserInitial());
+    this._saveUserUsecase,
+    this._getUserUsecase,
+    this._updateUserUsecase,
+    this._checkUserExistsUsecase,
+  ) : super(UserInitial());
 
   Future<void> saveUser(UserEntity user) async {
     emit(UserLoading());
@@ -105,16 +104,15 @@ class UserCubit extends Cubit<UserState> {
   void resetState() {
     emit(UserInitial());
   }
+
   void setUser(UserEntity user) {
     emit(UserLoaded(user));
   }
+
   void avatarChanged(File file) {
     final currentState = state;
     if (currentState is UserLoaded) {
       emit(UserLoadedImage(currentState.user, file));
     }
   }
-
 }
-
-

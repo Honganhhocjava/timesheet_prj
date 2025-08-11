@@ -1,14 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 import 'package:timesheet_project/features/attendance_adjustment/domain/entities/attendance_adjustment_entity.dart';
 import 'package:timesheet_project/features/attendance_adjustment/domain/repositories/attendance_adjustment_repository.dart';
 import 'package:timesheet_project/features/user/domain/entities/user_entity.dart';
 import 'package:timesheet_project/features/user/data/models/user_model.dart';
+import 'package:timesheet_project/features/attendance/domain/usecases/create_request_notification_usecase.dart';
 
 class AttendanceAdjustmentRepositoryImpl
     implements AttendanceAdjustmentRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final CreateRequestNotificationUsecase? _createNotificationUsecase;
+
+  AttendanceAdjustmentRepositoryImpl([this._createNotificationUsecase]);
 
   // Helper method to convert JSON to AttendanceAdjustmentEntity
   AttendanceAdjustmentEntity _jsonToEntity(Map<String, dynamic> json) {
@@ -61,33 +66,13 @@ class AttendanceAdjustmentRepositoryImpl
   }
 
   // Helper method to convert status string to enum
-  AttendanceAdjustmentStatus _stringToStatus(String status) {
-    switch (status) {
-      case 'pending':
-        return AttendanceAdjustmentStatus.pending;
-      case 'approved':
-        return AttendanceAdjustmentStatus.approved;
-      case 'rejected':
-        return AttendanceAdjustmentStatus.rejected;
-      case 'cancelled':
-        return AttendanceAdjustmentStatus.cancelled;
-      default:
-        return AttendanceAdjustmentStatus.pending;
-    }
+  RequestStatus _stringToStatus(String status) {
+    return status.toRequestStatus();
   }
 
   // Helper method to convert status enum to string
-  String _statusToString(AttendanceAdjustmentStatus status) {
-    switch (status) {
-      case AttendanceAdjustmentStatus.pending:
-        return 'pending';
-      case AttendanceAdjustmentStatus.approved:
-        return 'approved';
-      case AttendanceAdjustmentStatus.rejected:
-        return 'rejected';
-      case AttendanceAdjustmentStatus.cancelled:
-        return 'cancelled';
-    }
+  String _statusToString(RequestStatus status) {
+    return status.toStringValue();
   }
 
   @override
@@ -129,6 +114,25 @@ class AttendanceAdjustmentRepositoryImpl
           .collection('attendance_adjustments')
           .doc(adjustment.id)
           .set(adjustmentJson);
+
+      // Tạo notification cho manager
+      if (_createNotificationUsecase != null) {
+        try {
+          await _createNotificationUsecase!.call(
+            CreateRequestNotificationParams(
+              requestId: adjustment.id,
+              requestType: RequestType.attendance,
+              status: RequestStatus.pending,
+              userId: adjustment.idUser,
+              managerId: adjustment.idManager,
+              action: NotificationAction.create,
+            ),
+          );
+        } catch (e) {
+          print('DEBUG: Error creating notification: $e');
+          // Không throw exception vì việc tạo notification không ảnh hưởng đến việc tạo đơn
+        }
+      }
     } catch (e) {
       throw Exception('Lỗi khi tạo đơn điều chỉnh chấm công: $e');
     }
@@ -146,9 +150,8 @@ class AttendanceAdjustmentRepositoryImpl
           .get();
 
       // Sort locally to avoid composite index
-      final results = querySnapshot.docs
-          .map((doc) => _jsonToEntity(doc.data()))
-          .toList();
+      final results =
+          querySnapshot.docs.map((doc) => _jsonToEntity(doc.data())).toList();
 
       results.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
@@ -177,9 +180,8 @@ class AttendanceAdjustmentRepositoryImpl
       );
 
       // Sort in memory to avoid index requirement
-      final results = querySnapshot.docs
-          .map((doc) => _jsonToEntity(doc.data()))
-          .toList();
+      final results =
+          querySnapshot.docs.map((doc) => _jsonToEntity(doc.data())).toList();
 
       results.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
@@ -197,10 +199,8 @@ class AttendanceAdjustmentRepositoryImpl
     String id,
   ) async {
     try {
-      final docSnapshot = await _firestore
-          .collection('attendance_adjustments')
-          .doc(id)
-          .get();
+      final docSnapshot =
+          await _firestore.collection('attendance_adjustments').doc(id).get();
 
       if (docSnapshot.exists && docSnapshot.data() != null) {
         return _jsonToEntity(docSnapshot.data()!);
@@ -214,7 +214,7 @@ class AttendanceAdjustmentRepositoryImpl
   @override
   Future<void> updateAttendanceAdjustmentStatus(
     String id,
-    AttendanceAdjustmentStatus status,
+    RequestStatus status,
     String? comment,
   ) async {
     try {
@@ -253,6 +253,25 @@ class AttendanceAdjustmentRepositoryImpl
         'status': _statusToString(status),
         'activitiesLog': updatedActivitiesLog,
       });
+
+      // Tạo notification cho user khi duyệt đơn
+      if (_createNotificationUsecase != null) {
+        try {
+          await _createNotificationUsecase!.call(
+            CreateRequestNotificationParams(
+              requestId: id,
+              requestType: RequestType.attendance,
+              status: status,
+              userId: currentData['idUser'] ?? '',
+              managerId: currentData['idManager'] ?? '',
+              action: NotificationAction.approve,
+            ),
+          );
+        } catch (e) {
+          print('DEBUG: Error creating notification: $e');
+          // Không throw exception vì việc tạo notification không ảnh hưởng đến việc duyệt đơn
+        }
+      }
     } catch (e) {
       throw Exception('Lỗi khi cập nhật trạng thái đơn điều chỉnh: $e');
     }

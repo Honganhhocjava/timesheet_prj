@@ -1,6 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/material.dart';
 import 'package:timesheet_project/features/work_log/domain/entities/work_log_entity.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
+import 'package:timesheet_project/core/converters/request_converters.dart';
 
 part 'work_log_model.freezed.dart';
 part 'work_log_model.g.dart';
@@ -11,7 +13,7 @@ class WorkLogModel with _$WorkLogModel {
     required String id,
     required String idUser,
     required String idManager,
-    required String status,
+    @RequestStatusConverter() required RequestStatus status,
     required DateTime workDate,
     required String checkInTime,
     required String checkOutTime,
@@ -45,7 +47,7 @@ extension WorkLogModelExtension on WorkLogModel {
       id: id,
       idUser: idUser,
       idManager: idManager,
-      status: _statusFromString(status),
+      status: status,
       workDate: workDate,
       checkInTime: _timeFromString(checkInTime),
       checkOutTime: _timeFromString(checkOutTime),
@@ -60,7 +62,7 @@ extension WorkLogModelExtension on WorkLogModel {
       id: entity.id,
       idUser: entity.idUser,
       idManager: entity.idManager,
-      status: _statusToString(entity.status),
+      status: entity.status,
       workDate: entity.workDate,
       checkInTime: _timeToString(entity.checkInTime),
       checkOutTime: _timeToString(entity.checkOutTime),
@@ -72,32 +74,12 @@ extension WorkLogModelExtension on WorkLogModel {
     );
   }
 
-  static WorkLogStatus _statusFromString(String status) {
-    switch (status) {
-      case 'pending':
-        return WorkLogStatus.pending;
-      case 'approved':
-        return WorkLogStatus.approved;
-      case 'rejected':
-        return WorkLogStatus.rejected;
-      case 'cancelled':
-        return WorkLogStatus.cancelled;
-      default:
-        return WorkLogStatus.pending;
-    }
+  static RequestStatus _statusFromString(String status) {
+    return status.toRequestStatus();
   }
 
-  static String _statusToString(WorkLogStatus status) {
-    switch (status) {
-      case WorkLogStatus.pending:
-        return 'pending';
-      case WorkLogStatus.approved:
-        return 'approved';
-      case WorkLogStatus.rejected:
-        return 'rejected';
-      case WorkLogStatus.cancelled:
-        return 'cancelled';
-    }
+  static String _statusToString(RequestStatus status) {
+    return status.toStringValue();
   }
 
   static TimeOfDay _timeFromString(String timeString) {

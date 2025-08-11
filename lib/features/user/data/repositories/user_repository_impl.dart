@@ -24,10 +24,8 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<UserEntity?> getUserData(String uid) async {
     try {
-      DocumentSnapshot doc = await _firestore
-          .collection('users')
-          .doc(uid)
-          .get();
+      DocumentSnapshot doc =
+          await _firestore.collection('users').doc(uid).get();
 
       if (doc.exists) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
@@ -62,10 +60,8 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<bool> userExists(String uid) async {
     try {
-      DocumentSnapshot doc = await _firestore
-          .collection('users')
-          .doc(uid)
-          .get();
+      DocumentSnapshot doc =
+          await _firestore.collection('users').doc(uid).get();
       return doc.exists;
     } catch (e) {
       debugPrint("Lỗi kiểm tra user tồn tại: $e");

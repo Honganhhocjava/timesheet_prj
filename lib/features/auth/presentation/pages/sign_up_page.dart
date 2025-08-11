@@ -52,7 +52,6 @@ class _SignUpPageState extends State<SignUpPage> {
     super.dispose();
   }
 
-
   //new code
   File? _avatarFile;
   final ImagePicker _picker = ImagePicker();
@@ -70,7 +69,8 @@ class _SignUpPageState extends State<SignUpPage> {
     final cloudName = "dfstn25hz";
     final uploadPreset = "unsigned_preset";
 
-    final url = Uri.parse("https://api.cloudinary.com/v1_1/$cloudName/image/upload");
+    final url =
+        Uri.parse("https://api.cloudinary.com/v1_1/$cloudName/image/upload");
 
     final request = http.MultipartRequest("POST", url)
       ..fields['upload_preset'] = uploadPreset
@@ -86,7 +86,6 @@ class _SignUpPageState extends State<SignUpPage> {
       throw Exception("Upload failed with status: ${response.statusCode}");
     }
   }
-
 
   Future<void> _pickDate() async {
     final now = DateTime.now();
@@ -127,7 +126,8 @@ class _SignUpPageState extends State<SignUpPage> {
     });
 
     try {
-      String avatarUrl ='https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-3.jpg';
+      String avatarUrl =
+          'https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-3.jpg';
 
       if (_avatarFile != null) {
         avatarUrl = await _uploadAvatarToCloudinary(_avatarFile!);
@@ -143,7 +143,6 @@ class _SignUpPageState extends State<SignUpPage> {
         avatarUrl: avatarUrl,
         role: _selectedRole ?? 'Nhân viên',
       );
-
 
       await _userCubit.saveUser(userEntity);
 
@@ -195,7 +194,7 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:const Color(0xFF0957AE),
+      backgroundColor: const Color(0xFF0957AE),
       appBar: AppBar(
         centerTitle: true,
         automaticallyImplyLeading: false,
@@ -203,7 +202,7 @@ class _SignUpPageState extends State<SignUpPage> {
           'Đăng ký thông tin',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color:Colors.white,
+            color: Colors.white,
           ),
         ),
         backgroundColor: const Color(0xFF0957AE),
@@ -243,24 +242,27 @@ class _SignUpPageState extends State<SignUpPage> {
                   //     ),
                   //   ),
                   // ),
-              Center(
-              child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-                onTap: _pickAvatar,
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage: _avatarFile != null
-                      ? FileImage(_avatarFile!)
-                      : null,
-                  backgroundColor: Colors.grey[300],
-                  child: _avatarFile == null
-                      ? const Icon(Icons.camera_alt, color: Colors.white, size: 30)
-                      : null,
-                ),
-              ),
-            ),
-              const SizedBox(height: 20),
-                  SizedBox(height:40 ,),
+                  Center(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _pickAvatar,
+                      child: CircleAvatar(
+                        radius: 50,
+                        backgroundImage: _avatarFile != null
+                            ? FileImage(_avatarFile!)
+                            : null,
+                        backgroundColor: Colors.grey[300],
+                        child: _avatarFile == null
+                            ? const Icon(Icons.camera_alt,
+                                color: Colors.white, size: 30)
+                            : null,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: 40,
+                  ),
                   TextFormField(
                     controller: _firstNameController,
                     decoration: _inputDecoration(
@@ -269,8 +271,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     validator: (value) =>
                         (value == null || value.trim().isEmpty)
-                        ? 'Vui lòng nhập First Name'
-                        : null,
+                            ? 'Vui lòng nhập First Name'
+                            : null,
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
@@ -281,8 +283,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     validator: (value) =>
                         (value == null || value.trim().isEmpty)
-                        ? 'Vui lòng nhập Last Name'
-                        : null,
+                            ? 'Vui lòng nhập Last Name'
+                            : null,
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
@@ -291,8 +293,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     keyboardType: TextInputType.phone,
                     validator: (value) =>
                         (value == null || value.trim().isEmpty)
-                        ? 'Vui lòng nhập Phone'
-                        : null,
+                            ? 'Vui lòng nhập Phone'
+                            : null,
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
@@ -302,8 +304,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     onTap: _pickDate,
                     validator: (value) =>
                         (value == null || value.trim().isEmpty)
-                        ? 'Vui lòng chọn Birthday'
-                        : null,
+                            ? 'Vui lòng chọn Birthday'
+                            : null,
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
@@ -311,8 +313,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     decoration: _inputDecoration('Address', 'Enter address'),
                     validator: (value) =>
                         (value == null || value.trim().isEmpty)
-                        ? 'Vui lòng nhập Address'
-                        : null,
+                            ? 'Vui lòng nhập Address'
+                            : null,
                   ),
                   const SizedBox(height: 20),
                   DropdownButtonFormField<String>(

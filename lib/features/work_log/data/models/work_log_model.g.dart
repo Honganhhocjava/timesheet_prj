@@ -11,7 +11,7 @@ _$WorkLogModelImpl _$$WorkLogModelImplFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       idUser: json['idUser'] as String,
       idManager: json['idManager'] as String,
-      status: json['status'] as String,
+      status: const RequestStatusConverter().fromJson(json['status'] as String),
       workDate: DateTime.parse(json['workDate'] as String),
       checkInTime: json['checkInTime'] as String,
       checkOutTime: json['checkOutTime'] as String,
@@ -27,7 +27,7 @@ Map<String, dynamic> _$$WorkLogModelImplToJson(_$WorkLogModelImpl instance) =>
       'id': instance.id,
       'idUser': instance.idUser,
       'idManager': instance.idManager,
-      'status': instance.status,
+      'status': const RequestStatusConverter().toJson(instance.status),
       'workDate': instance.workDate.toIso8601String(),
       'checkInTime': instance.checkInTime,
       'checkOutTime': instance.checkOutTime,
@@ -37,23 +37,23 @@ Map<String, dynamic> _$$WorkLogModelImplToJson(_$WorkLogModelImpl instance) =>
     };
 
 _$ActivityLogModelImpl _$$ActivityLogModelImplFromJson(
-  Map<String, dynamic> json,
-) => _$ActivityLogModelImpl(
-  id: json['id'] as String,
-  action: json['action'] as String,
-  userId: json['userId'] as String,
-  userRole: json['userRole'] as String,
-  timestamp: DateTime.parse(json['timestamp'] as String),
-  comment: json['comment'] as String?,
-);
+        Map<String, dynamic> json) =>
+    _$ActivityLogModelImpl(
+      id: json['id'] as String,
+      action: json['action'] as String,
+      userId: json['userId'] as String,
+      userRole: json['userRole'] as String,
+      timestamp: DateTime.parse(json['timestamp'] as String),
+      comment: json['comment'] as String?,
+    );
 
 Map<String, dynamic> _$$ActivityLogModelImplToJson(
-  _$ActivityLogModelImpl instance,
-) => <String, dynamic>{
-  'id': instance.id,
-  'action': instance.action,
-  'userId': instance.userId,
-  'userRole': instance.userRole,
-  'timestamp': instance.timestamp.toIso8601String(),
-  'comment': instance.comment,
-};
+        _$ActivityLogModelImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'action': instance.action,
+      'userId': instance.userId,
+      'userRole': instance.userRole,
+      'timestamp': instance.timestamp.toIso8601String(),
+      'comment': instance.comment,
+    };

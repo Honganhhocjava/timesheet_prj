@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 
 class LeaveRequestEntity {
   final String id;
   final String idUser;
   final String idManager;
-  final LeaveRequestStatus status;
+  final RequestStatus status;
   final DateTime startDate;
   final DateTime endDate;
   final TimeOfDay startTime;
@@ -31,7 +32,7 @@ class LeaveRequestEntity {
     String? id,
     String? idUser,
     String? idManager,
-    LeaveRequestStatus? status,
+    RequestStatus? status,
     DateTime? startDate,
     DateTime? endDate,
     TimeOfDay? startTime,
@@ -55,8 +56,6 @@ class LeaveRequestEntity {
     );
   }
 }
-
-enum LeaveRequestStatus { pending, approved, rejected, cancelled }
 
 class ActivityLog {
   final String id;

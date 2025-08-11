@@ -5,9 +5,14 @@ import 'package:timesheet_project/features/leave_request/domain/entities/leave_r
 import 'package:timesheet_project/features/leave_request/domain/repositories/leave_request_repository.dart';
 import 'package:timesheet_project/features/user/domain/entities/user_entity.dart';
 import 'package:timesheet_project/features/user/data/models/user_model.dart';
+import 'package:timesheet_project/features/attendance/domain/usecases/create_request_notification_usecase.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 
 class LeaveRequestRepositoryImpl implements LeaveRequestRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final CreateRequestNotificationUsecase? _createNotificationUsecase;
+
+  LeaveRequestRepositoryImpl([this._createNotificationUsecase]);
 
   LeaveRequestEntity _jsonToEntity(Map<String, dynamic> json) {
     try {
@@ -22,7 +27,9 @@ class LeaveRequestRepositoryImpl implements LeaveRequestRepository {
             action: logMap['action'] as String? ?? '',
             userId: logMap['userId'] as String? ?? '',
             userRole: logMap['userRole'] as String? ?? '',
-            timestamp: DateTime.tryParse(logMap['timestamp'] as String? ?? '') ?? DateTime.now(),
+            timestamp:
+                DateTime.tryParse(logMap['timestamp'] as String? ?? '') ??
+                    DateTime.now(),
             comment: logMap['comment'] as String?,
           );
         } catch (e) {
@@ -42,14 +49,18 @@ class LeaveRequestRepositoryImpl implements LeaveRequestRepository {
         id: json['id'] as String? ?? '',
         idUser: json['idUser'] as String? ?? '',
         idManager: json['idManager'] as String? ?? '',
-        status: _stringToStatus(json['status'] as String? ?? 'pending'),
-        startDate: DateTime.tryParse(json['startDate'] as String? ?? '') ?? DateTime.now(),
-        endDate: DateTime.tryParse(json['endDate'] as String? ?? '') ?? DateTime.now(),
+        status: _stringToStatus(
+            json['status'] as String? ?? RequestStatus.pending.toStringValue()),
+        startDate: DateTime.tryParse(json['startDate'] as String? ?? '') ??
+            DateTime.now(),
+        endDate: DateTime.tryParse(json['endDate'] as String? ?? '') ??
+            DateTime.now(),
         startTime: _stringToTimeOfDay(json['startTime'] as String? ?? '09:00'),
         endTime: _stringToTimeOfDay(json['endTime'] as String? ?? '17:00'),
         reason: json['reason'] as String? ?? '',
         activitiesLog: activitiesLog,
-        createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+        createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ??
+            DateTime.now(),
       );
 
       print('DEBUG: Successfully parsed leave request: ${entity.id}');
@@ -78,34 +89,13 @@ class LeaveRequestRepositoryImpl implements LeaveRequestRepository {
   }
 
   // Helper method to convert status string to enum
-  LeaveRequestStatus _stringToStatus(String status) {
-    switch (status) {
-      case 'pending':
-        return LeaveRequestStatus.pending;
-      case 'approved':
-        return LeaveRequestStatus.approved;
-      case 'rejected':
-        return LeaveRequestStatus.rejected;
-      case 'cancelled':
-        return LeaveRequestStatus.cancelled;
-      default:
-        print('DEBUG: Unknown status: $status, defaulting to pending');
-        return LeaveRequestStatus.pending;
-    }
+  RequestStatus _stringToStatus(String status) {
+    return status.toRequestStatus();
   }
 
   // Helper method to convert status enum to string
-  String _statusToString(LeaveRequestStatus status) {
-    switch (status) {
-      case LeaveRequestStatus.pending:
-        return 'pending';
-      case LeaveRequestStatus.approved:
-        return 'approved';
-      case LeaveRequestStatus.rejected:
-        return 'rejected';
-      case LeaveRequestStatus.cancelled:
-        return 'cancelled';
-    }
+  String _statusToString(RequestStatus status) {
+    return status.toStringValue();
   }
 
   @override
@@ -114,14 +104,14 @@ class LeaveRequestRepositoryImpl implements LeaveRequestRepository {
       final activitiesLogJson = leaveRequest.activitiesLog
           .map(
             (log) => {
-          'id': log.id,
-          'action': log.action,
-          'userId': log.userId,
-          'userRole': log.userRole,
-          'timestamp': log.timestamp.toIso8601String(),
-          'comment': log.comment,
-        },
-      )
+              'id': log.id,
+              'action': log.action,
+              'userId': log.userId,
+              'userRole': log.userRole,
+              'timestamp': log.timestamp.toIso8601String(),
+              'comment': log.comment,
+            },
+          )
           .toList();
 
       final leaveRequestJson = {
@@ -142,6 +132,25 @@ class LeaveRequestRepositoryImpl implements LeaveRequestRepository {
           .collection('leave_requests')
           .doc(leaveRequest.id)
           .set(leaveRequestJson);
+
+      // Tạo notification cho manager
+      if (_createNotificationUsecase != null) {
+        try {
+          await _createNotificationUsecase!.call(
+            CreateRequestNotificationParams(
+              requestId: leaveRequest.id,
+              requestType: RequestType.leave,
+              status: RequestStatus.pending,
+              userId: leaveRequest.idUser,
+              managerId: leaveRequest.idManager,
+              action: NotificationAction.create,
+            ),
+          );
+        } catch (e) {
+          print('DEBUG: Error creating notification: $e');
+          // Không throw exception vì việc tạo notification không ảnh hưởng đến việc tạo đơn
+        }
+      }
     } catch (e) {
       throw Exception('Lỗi khi tạo đơn xin nghỉ: $e');
     }
@@ -157,9 +166,8 @@ class LeaveRequestRepositoryImpl implements LeaveRequestRepository {
           .get();
 
       // Sort locally to avoid composite index
-      final results = querySnapshot.docs
-          .map((doc) => _jsonToEntity(doc.data()))
-          .toList();
+      final results =
+          querySnapshot.docs.map((doc) => _jsonToEntity(doc.data())).toList();
 
       results.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
@@ -171,34 +179,34 @@ class LeaveRequestRepositoryImpl implements LeaveRequestRepository {
 
   @override
   Future<List<LeaveRequestEntity>> getLeaveRequestsByManager(
-      String managerId,
-      ) async {
+    String managerId,
+  ) async {
     try {
-     // print('DEBUG: Getting leave requests for manager: $managerId');
+      // print('DEBUG: Getting leave requests for manager: $managerId');
 
       final querySnapshot = await _firestore
           .collection('leave_requests')
           .where('idManager', isEqualTo: managerId)
           .get();
 
-     // print('DEBUG: Found ${querySnapshot.docs.length} leave request documents');
+      // print('DEBUG: Found ${querySnapshot.docs.length} leave request documents');
 
       final results = <LeaveRequestEntity>[];
       for (final doc in querySnapshot.docs) {
         try {
           final data = doc.data();
-         // print('DEBUG: Processing document ${doc.id} with data: ${data.keys}');
+          // print('DEBUG: Processing document ${doc.id} with data: ${data.keys}');
 
           final entity = _jsonToEntity(data);
           results.add(entity);
         } catch (e) {
-        //  print('DEBUG: Error processing document ${doc.id}: $e');
+          //  print('DEBUG: Error processing document ${doc.id}: $e');
           // Continue with other documents
         }
       }
 
       results.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-     // print('DEBUG: Successfully processed ${results.length} leave requests');
+      // print('DEBUG: Successfully processed ${results.length} leave requests');
 
       return results;
     } catch (e) {
@@ -210,10 +218,8 @@ class LeaveRequestRepositoryImpl implements LeaveRequestRepository {
   @override
   Future<LeaveRequestEntity?> getLeaveRequestById(String id) async {
     try {
-      final docSnapshot = await _firestore
-          .collection('leave_requests')
-          .doc(id)
-          .get();
+      final docSnapshot =
+          await _firestore.collection('leave_requests').doc(id).get();
 
       if (docSnapshot.exists && docSnapshot.data() != null) {
         return _jsonToEntity(docSnapshot.data()!);
@@ -226,12 +232,13 @@ class LeaveRequestRepositoryImpl implements LeaveRequestRepository {
 
   @override
   Future<void> updateLeaveRequestStatus(
-      String id,
-      LeaveRequestStatus status,
-      String? comment,
-      ) async {
+    String id,
+    RequestStatus status,
+    String? comment,
+  ) async {
     try {
-      print('DEBUG: LeaveRequestRepositoryImpl: Updating status for request $id to ${status.toString()}');
+      print(
+          'DEBUG: LeaveRequestRepositoryImpl: Updating status for request $id to ${status.toString()}');
       final docRef = _firestore.collection('leave_requests').doc(id);
 
       // Get current document to update activities log
@@ -241,7 +248,8 @@ class LeaveRequestRepositoryImpl implements LeaveRequestRepository {
       }
 
       final currentData = docSnapshot.data()!;
-      print('DEBUG: LeaveRequestRepositoryImpl: Current status: ${currentData['status']}');
+      print(
+          'DEBUG: LeaveRequestRepositoryImpl: Current status: ${currentData['status']}');
 
       // Get current user for activity log
       final currentUser = FirebaseAuth.instance.currentUser;
@@ -269,7 +277,27 @@ class LeaveRequestRepositoryImpl implements LeaveRequestRepository {
         'activitiesLog': updatedActivitiesLog,
       });
 
-      print('DEBUG: LeaveRequestRepositoryImpl: Status updated successfully to ${_statusToString(status)}');
+      // Tạo notification cho user khi duyệt đơn
+      if (_createNotificationUsecase != null) {
+        try {
+          await _createNotificationUsecase!.call(
+            CreateRequestNotificationParams(
+              requestId: id,
+              requestType: RequestType.leave,
+              status: status,
+              userId: currentData['idUser'] ?? '',
+              managerId: currentData['idManager'] ?? '',
+              action: NotificationAction.approve,
+            ),
+          );
+        } catch (e) {
+          print('DEBUG: Error creating notification: $e');
+          // Không throw exception vì việc tạo notification không ảnh hưởng đến việc duyệt đơn
+        }
+      }
+
+      print(
+          'DEBUG: LeaveRequestRepositoryImpl: Status updated successfully to ${_statusToString(status)}');
     } catch (e) {
       print('DEBUG: LeaveRequestRepositoryImpl: Error updating status: $e');
       throw Exception('Lỗi khi cập nhật trạng thái đơn xin nghỉ: $e');
@@ -282,14 +310,14 @@ class LeaveRequestRepositoryImpl implements LeaveRequestRepository {
       final activitiesLogJson = leaveRequest.activitiesLog
           .map(
             (log) => {
-          'id': log.id,
-          'action': log.action,
-          'userId': log.userId,
-          'userRole': log.userRole,
-          'timestamp': log.timestamp.toIso8601String(),
-          'comment': log.comment,
-        },
-      )
+              'id': log.id,
+              'action': log.action,
+              'userId': log.userId,
+              'userRole': log.userRole,
+              'timestamp': log.timestamp.toIso8601String(),
+              'comment': log.comment,
+            },
+          )
           .toList();
 
       final leaveRequestJson = {

@@ -1,3 +1,5 @@
+import 'package:timesheet_project/core/enums/request_enums.dart';
+
 class CalendarDayRequests {
   final List<Map<String, dynamic>> leaveRequests;
   final List<Map<String, dynamic>> overtimeRequests;
@@ -15,17 +17,17 @@ class CalendarDayRequests {
         workLogs = workLogs ?? [];
 
   void addRequest(String type, Map<String, dynamic> data) {
-    switch (type) {
-      case 'leave':
+    switch (type.toRequestType()) {
+      case RequestType.leave:
         leaveRequests.add(data);
         break;
-      case 'overtime':
+      case RequestType.overtime:
         overtimeRequests.add(data);
         break;
-      case 'attendance':
+      case RequestType.attendance:
         attendanceAdjustments.add(data);
         break;
-      case 'worklog':
+      case RequestType.worklog:
         workLogs.add(data);
         break;
     }

@@ -77,7 +77,6 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
-
                   children: [
                     Text('Login',
                         style: TextStyle(
@@ -99,8 +98,13 @@ class _LoginPageState extends State<LoginPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Tên đăng nhập",style: TextStyle(fontWeight: FontWeight.bold),),
-                              SizedBox(height: 8,),
+                              Text(
+                                "Tên đăng nhập",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: 8,
+                              ),
                               TextFormField(
                                 controller: _emailController,
                                 decoration: InputDecoration(
@@ -124,8 +128,13 @@ class _LoginPageState extends State<LoginPage> {
                                 },
                               ),
                               const SizedBox(height: 20),
-                              Text("Mật khẩu",style: TextStyle(fontWeight: FontWeight.bold),),
-                              SizedBox(height: 8,),
+                              Text(
+                                "Mật khẩu",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: 8,
+                              ),
                               TextFormField(
                                 controller: _passwordController,
                                 decoration: InputDecoration(
@@ -180,7 +189,7 @@ class _LoginPageState extends State<LoginPage> {
                           return ElevatedButton(
                             onPressed: state is AuthLoading ? null : _login,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const  Color(0xFF0EC2F2),
+                              backgroundColor: const Color(0xFF0EC2F2),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),

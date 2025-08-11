@@ -59,13 +59,12 @@ class _RegisterPageState extends State<RegisterPage> {
           }
         } else {
           if (mounted) {
-            TopSnackbar.show(context,'Tài khoản email đã tồn tại.');
+            TopSnackbar.show(context, 'Tài khoản email đã tồn tại.');
           }
         }
       } catch (e) {
         if (mounted) {
-          TopSnackbar.show(context,'Lỗi: $e');
-
+          TopSnackbar.show(context, 'Lỗi: $e');
         }
       } finally {
         if (mounted) {
@@ -140,8 +139,13 @@ class _RegisterPageState extends State<RegisterPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Tên đăng nhập",style: TextStyle(fontWeight: FontWeight.bold),),
-                            SizedBox(height: 8,),
+                            Text(
+                              "Tên đăng nhập",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              height: 8,
+                            ),
                             // TextFormField(
                             //   controller: _emailController,
                             //   decoration: _inputDecoration('User (Email)'),
@@ -172,7 +176,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   return 'Vui lòng nhập email';
                                 }
                                 final emailRegex =
-                                RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+                                    RegExp(r'^[^@]+@[^@]+\.[^@]+$');
                                 if (!emailRegex.hasMatch(value.trim())) {
                                   return 'Email không hợp lệ';
                                 }
@@ -180,8 +184,13 @@ class _RegisterPageState extends State<RegisterPage> {
                               },
                             ),
                             const SizedBox(height: 20),
-                            Text("Mật khẩu",style: TextStyle(fontWeight: FontWeight.bold),),
-                            SizedBox(height: 8,),
+                            Text(
+                              "Mật khẩu",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              height: 8,
+                            ),
                             // TextFormField(
                             //   controller: _passwordController,
                             //   decoration: _inputDecoration('Password'),
@@ -218,7 +227,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 32),
                   SizedBox(
                     width: double.infinity,

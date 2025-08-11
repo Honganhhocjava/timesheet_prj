@@ -149,11 +149,9 @@ class AttendanceAdjustmentCubit extends Cubit<AttendanceAdjustmentState> {
     // Validation: Giờ vào phải nhỏ hơn giờ ra (original)
     if (formState.originalCheckIn != null &&
         formState.originalCheckOut != null) {
-      final originalCheckInMinutes =
-          formState.originalCheckIn!.hour * 60 +
+      final originalCheckInMinutes = formState.originalCheckIn!.hour * 60 +
           formState.originalCheckIn!.minute;
-      final originalCheckOutMinutes =
-          formState.originalCheckOut!.hour * 60 +
+      final originalCheckOutMinutes = formState.originalCheckOut!.hour * 60 +
           formState.originalCheckOut!.minute;
 
       if (originalCheckInMinutes >= originalCheckOutMinutes) {
@@ -165,11 +163,9 @@ class AttendanceAdjustmentCubit extends Cubit<AttendanceAdjustmentState> {
     // Validation: Giờ vào phải nhỏ hơn giờ ra (adjusted)
     if (formState.adjustedCheckIn != null &&
         formState.adjustedCheckOut != null) {
-      final adjustedCheckInMinutes =
-          formState.adjustedCheckIn!.hour * 60 +
+      final adjustedCheckInMinutes = formState.adjustedCheckIn!.hour * 60 +
           formState.adjustedCheckIn!.minute;
-      final adjustedCheckOutMinutes =
-          formState.adjustedCheckOut!.hour * 60 +
+      final adjustedCheckOutMinutes = formState.adjustedCheckOut!.hour * 60 +
           formState.adjustedCheckOut!.minute;
 
       if (adjustedCheckInMinutes >= adjustedCheckOutMinutes) {

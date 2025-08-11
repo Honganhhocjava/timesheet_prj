@@ -40,5 +40,4 @@ class UserEntity {
       role: role ?? this.role,
     );
   }
-
 }

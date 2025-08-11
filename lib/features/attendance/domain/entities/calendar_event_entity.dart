@@ -1,8 +1,10 @@
+import 'package:timesheet_project/core/enums/request_enums.dart';
+
 class CalendarEventEntity {
   final String id;
   final String requestId;
-  final String requestType; // 'leave', 'overtime', 'attendance'
-  final String status; // 'pending', 'approved', 'rejected', 'cancelled'
+  final RequestType requestType;
+  final RequestStatus status;
   final DateTime date;
   final String title;
   final String reason;
@@ -19,30 +21,28 @@ class CalendarEventEntity {
 
   // Helper method to get color based on status
   String getStatusColor() {
-    switch (status.toLowerCase()) {
-      case 'cancelled':
-      case 'rejected':
+    switch (status) {
+      case RequestStatus.cancelled:
+      case RequestStatus.rejected:
         return '#FF0000'; // Red
-      case 'approved':
+      case RequestStatus.approved:
         return '#00FF00'; // Green
-      case 'pending':
+      case RequestStatus.pending:
         return '#FFA500'; // Orange
-      default:
-        return '#808080'; // Gray
     }
   }
 
   // Helper method to get display title
   String getDisplayTitle() {
     switch (requestType) {
-      case 'leave':
+      case RequestType.leave:
         return 'Đơn nghỉ phép';
-      case 'overtime':
+      case RequestType.overtime:
         return 'Đơn làm thêm giờ';
-      case 'attendance':
+      case RequestType.attendance:
         return 'Đơn điều chỉnh chấm công';
-      default:
-        return 'Đơn';
+      case RequestType.worklog:
+        return 'Đơn chấm công làm việc từ xa';
     }
   }
 }

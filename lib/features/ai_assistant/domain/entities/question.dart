@@ -4,6 +4,9 @@ class Question {
   final List<String> options;
   final String answer;
 
-  Question({required this.id, required this.question, required this.options, required this.answer});
-
+  Question(
+      {required this.id,
+      required this.question,
+      required this.options,
+      required this.answer});
 }

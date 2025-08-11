@@ -158,8 +158,8 @@ class CreateOvertimeRequestPage extends StatelessWidget {
               onPressed: state.isLoading
                   ? null
                   : () => context
-                        .read<OvertimeRequestCubit>()
-                        .submitOvertimeRequest(),
+                      .read<OvertimeRequestCubit>()
+                      .submitOvertimeRequest(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0A357D),
                 shape: RoundedRectangleBorder(

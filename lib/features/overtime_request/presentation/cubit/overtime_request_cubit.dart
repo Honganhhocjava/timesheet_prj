@@ -7,6 +7,7 @@ import 'package:timesheet_project/features/overtime_request/domain/entities/over
 import 'package:timesheet_project/features/overtime_request/presentation/cubit/overtime_request_state.dart';
 import 'package:timesheet_project/features/user/domain/entities/user_entity.dart';
 import 'package:timesheet_project/core/usecases/usecase.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 
 class OvertimeRequestCubit extends Cubit<OvertimeRequestState> {
   final CreateOvertimeRequestUsecase _createOvertimeRequestUsecase;
@@ -160,7 +161,7 @@ class OvertimeRequestCubit extends Cubit<OvertimeRequestState> {
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         idUser: currentUser.uid,
         idManager: formState.selectedManager!.uid,
-        status: OvertimeRequestStatus.pending,
+        status: RequestStatus.pending,
         overtimeDate: formState.overtimeDate!,
         startTime: formState.startTime!,
         endTime: formState.endTime!,

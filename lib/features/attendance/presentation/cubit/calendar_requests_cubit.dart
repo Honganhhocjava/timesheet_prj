@@ -19,7 +19,6 @@ class CalendarRequestsCubit extends Cubit<CalendarRequestsState> {
       final userId = user.uid;
       final firestore = FirebaseFirestore.instance;
 
-
       final leaveDocsByUser = await firestore
           .collection('leave_requests')
           .where('idUser', isEqualTo: userId)

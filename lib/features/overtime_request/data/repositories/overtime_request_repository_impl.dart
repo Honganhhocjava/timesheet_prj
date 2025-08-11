@@ -5,9 +5,14 @@ import 'package:timesheet_project/features/overtime_request/domain/entities/over
 import 'package:timesheet_project/features/overtime_request/domain/repositories/overtime_request_repository.dart';
 import 'package:timesheet_project/features/user/domain/entities/user_entity.dart';
 import 'package:timesheet_project/features/user/data/models/user_model.dart';
+import 'package:timesheet_project/features/attendance/domain/usecases/create_request_notification_usecase.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 
 class OvertimeRequestRepositoryImpl implements OvertimeRequestRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final CreateRequestNotificationUsecase? _createNotificationUsecase;
+
+  OvertimeRequestRepositoryImpl([this._createNotificationUsecase]);
 
   OvertimeRequestEntity _jsonToEntity(Map<String, dynamic> json) {
     final activitiesLogJson = json['activitiesLog'] as List<dynamic>? ?? [];
@@ -18,7 +23,8 @@ class OvertimeRequestRepositoryImpl implements OvertimeRequestRepository {
         action: logMap['action'] as String? ?? '',
         userId: logMap['userId'] as String? ?? '',
         userRole: logMap['userRole'] as String? ?? '',
-        timestamp: DateTime.tryParse(logMap['timestamp'] as String? ?? '') ?? DateTime.now(),
+        timestamp: DateTime.tryParse(logMap['timestamp'] as String? ?? '') ??
+            DateTime.now(),
         comment: logMap['comment'] as String?,
       );
     }).toList();
@@ -27,15 +33,19 @@ class OvertimeRequestRepositoryImpl implements OvertimeRequestRepository {
       id: json['id'] as String? ?? '',
       idUser: json['idUser'] as String? ?? '',
       idManager: json['idManager'] as String? ?? '',
-      status: _stringToStatus(json['status'] as String? ?? 'pending'),
-      overtimeDate: DateTime.tryParse(json['overtimeDate'] as String? ?? '') ?? DateTime.now(),
+      status: _stringToStatus(
+          json['status'] as String? ?? RequestStatus.pending.toStringValue()),
+      overtimeDate: DateTime.tryParse(json['overtimeDate'] as String? ?? '') ??
+          DateTime.now(),
       startTime: _stringToTimeOfDay(json['startTime'] as String? ?? '18:00'),
       endTime: _stringToTimeOfDay(json['endTime'] as String? ?? '20:00'),
       reason: json['reason'] as String? ?? '',
       activitiesLog: activitiesLog,
-      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
+
   // Helper method to convert string to TimeOfDay
   TimeOfDay _stringToTimeOfDay(String timeString) {
     final parts = timeString.split(':');
@@ -48,33 +58,13 @@ class OvertimeRequestRepositoryImpl implements OvertimeRequestRepository {
   }
 
   // Helper method to convert status string to enum
-  OvertimeRequestStatus _stringToStatus(String status) {
-    switch (status) {
-      case 'pending':
-        return OvertimeRequestStatus.pending;
-      case 'approved':
-        return OvertimeRequestStatus.approved;
-      case 'rejected':
-        return OvertimeRequestStatus.rejected;
-      case 'cancelled':
-        return OvertimeRequestStatus.cancelled;
-      default:
-        return OvertimeRequestStatus.pending;
-    }
+  RequestStatus _stringToStatus(String status) {
+    return status.toRequestStatus();
   }
 
   // Helper method to convert status enum to string
-  String _statusToString(OvertimeRequestStatus status) {
-    switch (status) {
-      case OvertimeRequestStatus.pending:
-        return 'pending';
-      case OvertimeRequestStatus.approved:
-        return 'approved';
-      case OvertimeRequestStatus.rejected:
-        return 'rejected';
-      case OvertimeRequestStatus.cancelled:
-        return 'cancelled';
-    }
+  String _statusToString(RequestStatus status) {
+    return status.toStringValue();
   }
 
   @override
@@ -112,6 +102,25 @@ class OvertimeRequestRepositoryImpl implements OvertimeRequestRepository {
           .collection('overtime_requests')
           .doc(overtimeRequest.id)
           .set(overtimeRequestJson);
+
+      // Tạo notification cho manager
+      if (_createNotificationUsecase != null) {
+        try {
+          await _createNotificationUsecase!.call(
+            CreateRequestNotificationParams(
+              requestId: overtimeRequest.id,
+              requestType: RequestType.overtime,
+              status: RequestStatus.pending,
+              userId: overtimeRequest.idUser,
+              managerId: overtimeRequest.idManager,
+              action: NotificationAction.create,
+            ),
+          );
+        } catch (e) {
+          print('DEBUG: Error creating notification: $e');
+          // Không throw exception vì việc tạo notification không ảnh hưởng đến việc tạo đơn
+        }
+      }
     } catch (e) {
       throw Exception('Lỗi khi tạo đơn xin làm thêm giờ: $e');
     }
@@ -146,9 +155,8 @@ class OvertimeRequestRepositoryImpl implements OvertimeRequestRepository {
           .where('idManager', isEqualTo: managerId)
           .get();
 
-      final results = querySnapshot.docs
-          .map((doc) => _jsonToEntity(doc.data()))
-          .toList();
+      final results =
+          querySnapshot.docs.map((doc) => _jsonToEntity(doc.data())).toList();
 
       results.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
@@ -163,10 +171,8 @@ class OvertimeRequestRepositoryImpl implements OvertimeRequestRepository {
   @override
   Future<OvertimeRequestEntity?> getOvertimeRequestById(String id) async {
     try {
-      final docSnapshot = await _firestore
-          .collection('overtime_requests')
-          .doc(id)
-          .get();
+      final docSnapshot =
+          await _firestore.collection('overtime_requests').doc(id).get();
 
       if (docSnapshot.exists) {
         return _jsonToEntity(docSnapshot.data()!);
@@ -180,7 +186,7 @@ class OvertimeRequestRepositoryImpl implements OvertimeRequestRepository {
   @override
   Future<void> updateOvertimeRequestStatus(
     String id,
-    OvertimeRequestStatus status,
+    RequestStatus status,
     String? comment,
   ) async {
     try {
@@ -221,15 +227,24 @@ class OvertimeRequestRepositoryImpl implements OvertimeRequestRepository {
         'activitiesLog': updatedActivitiesLog,
       });
 
-      print(
-        'OvertimeRequestRepositoryImpl: Status updated, creating notification',
-      );
-      // Create notification for the user
-      // The notification service dependency was removed, so this part is commented out.
-      // If notification functionality is needed, it should be re-added and injected.
-      print(
-        'OvertimeRequestRepositoryImpl: Notification skipped due to removed dependency',
-      );
+      // Tạo notification cho user khi duyệt đơn
+      if (_createNotificationUsecase != null) {
+        try {
+          await _createNotificationUsecase!.call(
+            CreateRequestNotificationParams(
+              requestId: id,
+              requestType: RequestType.overtime,
+              status: status,
+              userId: currentData['idUser'] ?? '',
+              managerId: currentData['idManager'] ?? '',
+              action: NotificationAction.approve,
+            ),
+          );
+        } catch (e) {
+          print('DEBUG: Error creating notification: $e');
+          // Không throw exception vì việc tạo notification không ảnh hưởng đến việc duyệt đơn
+        }
+      }
     } catch (e) {
       print('OvertimeRequestRepositoryImpl: Error updating status: $e');
       throw Exception('Lỗi khi cập nhật trạng thái đơn xin làm thêm giờ: $e');

@@ -12,8 +12,7 @@ part of 'question_models.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 QuestionModel _$QuestionModelFromJson(Map<String, dynamic> json) {
   return _QuestionModel.fromJson(json);
@@ -39,9 +38,8 @@ mixin _$QuestionModel {
 /// @nodoc
 abstract class $QuestionModelCopyWith<$Res> {
   factory $QuestionModelCopyWith(
-    QuestionModel value,
-    $Res Function(QuestionModel) then,
-  ) = _$QuestionModelCopyWithImpl<$Res, QuestionModel>;
+          QuestionModel value, $Res Function(QuestionModel) then) =
+      _$QuestionModelCopyWithImpl<$Res, QuestionModel>;
   @useResult
   $Res call({String id, String question, List<String> options, String answer});
 }
@@ -66,27 +64,24 @@ class _$QuestionModelCopyWithImpl<$Res, $Val extends QuestionModel>
     Object? options = null,
     Object? answer = null,
   }) {
-    return _then(
-      _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
-                      as String,
-            question: null == question
-                ? _value.question
-                : question // ignore: cast_nullable_to_non_nullable
-                      as String,
-            options: null == options
-                ? _value.options
-                : options // ignore: cast_nullable_to_non_nullable
-                      as List<String>,
-            answer: null == answer
-                ? _value.answer
-                : answer // ignore: cast_nullable_to_non_nullable
-                      as String,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      question: null == question
+          ? _value.question
+          : question // ignore: cast_nullable_to_non_nullable
+              as String,
+      options: null == options
+          ? _value.options
+          : options // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      answer: null == answer
+          ? _value.answer
+          : answer // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
   }
 }
 
@@ -94,9 +89,8 @@ class _$QuestionModelCopyWithImpl<$Res, $Val extends QuestionModel>
 abstract class _$$QuestionModelImplCopyWith<$Res>
     implements $QuestionModelCopyWith<$Res> {
   factory _$$QuestionModelImplCopyWith(
-    _$QuestionModelImpl value,
-    $Res Function(_$QuestionModelImpl) then,
-  ) = __$$QuestionModelImplCopyWithImpl<$Res>;
+          _$QuestionModelImpl value, $Res Function(_$QuestionModelImpl) then) =
+      __$$QuestionModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String id, String question, List<String> options, String answer});
@@ -107,9 +101,8 @@ class __$$QuestionModelImplCopyWithImpl<$Res>
     extends _$QuestionModelCopyWithImpl<$Res, _$QuestionModelImpl>
     implements _$$QuestionModelImplCopyWith<$Res> {
   __$$QuestionModelImplCopyWithImpl(
-    _$QuestionModelImpl _value,
-    $Res Function(_$QuestionModelImpl) _then,
-  ) : super(_value, _then);
+      _$QuestionModelImpl _value, $Res Function(_$QuestionModelImpl) _then)
+      : super(_value, _then);
 
   /// Create a copy of QuestionModel
   /// with the given fields replaced by the non-null parameter values.
@@ -121,39 +114,37 @@ class __$$QuestionModelImplCopyWithImpl<$Res>
     Object? options = null,
     Object? answer = null,
   }) {
-    return _then(
-      _$QuestionModelImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as String,
-        question: null == question
-            ? _value.question
-            : question // ignore: cast_nullable_to_non_nullable
-                  as String,
-        options: null == options
-            ? _value._options
-            : options // ignore: cast_nullable_to_non_nullable
-                  as List<String>,
-        answer: null == answer
-            ? _value.answer
-            : answer // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
+    return _then(_$QuestionModelImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      question: null == question
+          ? _value.question
+          : question // ignore: cast_nullable_to_non_nullable
+              as String,
+      options: null == options
+          ? _value._options
+          : options // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      answer: null == answer
+          ? _value.answer
+          : answer // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$QuestionModelImpl extends _QuestionModel {
-  const _$QuestionModelImpl({
-    required this.id,
-    required this.question,
-    required final List<String> options,
-    required this.answer,
-  }) : _options = options,
-       super._();
+  const _$QuestionModelImpl(
+      {required this.id,
+      required this.question,
+      required final List<String> options,
+      required this.answer})
+      : _options = options,
+        super._();
 
   factory _$QuestionModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$QuestionModelImplFromJson(json);
@@ -192,13 +183,8 @@ class _$QuestionModelImpl extends _QuestionModel {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    id,
-    question,
-    const DeepCollectionEquality().hash(_options),
-    answer,
-  );
+  int get hashCode => Object.hash(runtimeType, id, question,
+      const DeepCollectionEquality().hash(_options), answer);
 
   /// Create a copy of QuestionModel
   /// with the given fields replaced by the non-null parameter values.
@@ -210,17 +196,18 @@ class _$QuestionModelImpl extends _QuestionModel {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$QuestionModelImplToJson(this);
+    return _$$QuestionModelImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _QuestionModel extends QuestionModel {
-  const factory _QuestionModel({
-    required final String id,
-    required final String question,
-    required final List<String> options,
-    required final String answer,
-  }) = _$QuestionModelImpl;
+  const factory _QuestionModel(
+      {required final String id,
+      required final String question,
+      required final List<String> options,
+      required final String answer}) = _$QuestionModelImpl;
   const _QuestionModel._() : super._();
 
   factory _QuestionModel.fromJson(Map<String, dynamic> json) =

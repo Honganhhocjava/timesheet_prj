@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 import 'package:timesheet_project/features/attendance/domain/entities/calendar_event_entity.dart';
 import 'package:timesheet_project/features/attendance/domain/repositories/calendar_repository.dart';
 
@@ -115,8 +116,10 @@ class CalendarRepositoryImpl implements CalendarRepository {
             CalendarEventEntity(
               id: doc.id,
               requestId: doc.id,
-              requestType: 'leave',
-              status: data['status'] ?? 'pending',
+              requestType: RequestType.leave,
+              status: (data['status'] as String? ??
+                      RequestStatus.pending.toStringValue())
+                  .toRequestStatus(),
               date: startDate,
               title: 'Đơn nghỉ phép',
               reason: data['reason'] ?? '',
@@ -154,8 +157,10 @@ class CalendarRepositoryImpl implements CalendarRepository {
             CalendarEventEntity(
               id: doc.id,
               requestId: doc.id,
-              requestType: 'overtime',
-              status: data['status'] ?? 'pending',
+              requestType: RequestType.overtime,
+              status: (data['status'] as String? ??
+                      RequestStatus.pending.toStringValue())
+                  .toRequestStatus(),
               date: overtimeDate,
               title: 'Đơn làm thêm giờ',
               reason: data['reason'] ?? '',
@@ -193,8 +198,10 @@ class CalendarRepositoryImpl implements CalendarRepository {
             CalendarEventEntity(
               id: doc.id,
               requestId: doc.id,
-              requestType: 'attendance',
-              status: data['status'] ?? 'pending',
+              requestType: RequestType.attendance,
+              status: (data['status'] as String? ??
+                      RequestStatus.pending.toStringValue())
+                  .toRequestStatus(),
               date: adjustmentDate,
               title: 'Đơn điều chỉnh chấm công',
               reason: data['reason'] ?? '',
@@ -229,8 +236,8 @@ class CalendarRepositoryImpl implements CalendarRepository {
       if (user == null) return [];
 
       final dateString = date.toIso8601String().split(
-        'T',
-      )[0]; // YYYY-MM-DD format
+            'T',
+          )[0]; // YYYY-MM-DD format
       final List<CalendarEventEntity> events = [];
 
       // Get leave requests for the specific date
@@ -252,8 +259,10 @@ class CalendarRepositoryImpl implements CalendarRepository {
               CalendarEventEntity(
                 id: doc.id,
                 requestId: doc.id,
-                requestType: 'leave',
-                status: data['status'] ?? 'pending',
+                requestType: RequestType.leave,
+                status: (data['status'] as String? ??
+                        RequestStatus.pending.toStringValue())
+                    .toRequestStatus(),
                 date: startDate,
                 title: 'Đơn nghỉ phép',
                 reason: data['reason'] ?? '',
@@ -275,15 +284,17 @@ class CalendarRepositoryImpl implements CalendarRepository {
 
         if (overtimeDate != null) {
           final overtimeDateString = overtimeDate.toIso8601String().split(
-            'T',
-          )[0];
+                'T',
+              )[0];
           if (dateString == overtimeDateString) {
             events.add(
               CalendarEventEntity(
                 id: doc.id,
                 requestId: doc.id,
-                requestType: 'overtime',
-                status: data['status'] ?? 'pending',
+                requestType: RequestType.overtime,
+                status: (data['status'] as String? ??
+                        RequestStatus.pending.toStringValue())
+                    .toRequestStatus(),
                 date: overtimeDate,
                 title: 'Đơn làm thêm giờ',
                 reason: data['reason'] ?? '',
@@ -305,15 +316,17 @@ class CalendarRepositoryImpl implements CalendarRepository {
 
         if (adjustmentDate != null) {
           final adjustmentDateString = adjustmentDate.toIso8601String().split(
-            'T',
-          )[0];
+                'T',
+              )[0];
           if (dateString == adjustmentDateString) {
             events.add(
               CalendarEventEntity(
                 id: doc.id,
                 requestId: doc.id,
-                requestType: 'attendance',
-                status: data['status'] ?? 'pending',
+                requestType: RequestType.attendance,
+                status: (data['status'] as String? ??
+                        RequestStatus.pending.toStringValue())
+                    .toRequestStatus(),
                 date: adjustmentDate,
                 title: 'Đơn điều chỉnh chấm công',
                 reason: data['reason'] ?? '',

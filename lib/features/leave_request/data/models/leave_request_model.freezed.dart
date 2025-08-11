@@ -12,8 +12,7 @@ part of 'leave_request_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 LeaveRequestModel _$LeaveRequestModelFromJson(Map<String, dynamic> json) {
   return _LeaveRequestModel.fromJson(json);
@@ -24,7 +23,8 @@ mixin _$LeaveRequestModel {
   String get id => throw _privateConstructorUsedError;
   String get idUser => throw _privateConstructorUsedError;
   String get idManager => throw _privateConstructorUsedError;
-  String get status => throw _privateConstructorUsedError;
+  @RequestStatusConverter()
+  RequestStatus get status => throw _privateConstructorUsedError;
   DateTime get startDate => throw _privateConstructorUsedError;
   DateTime get endDate => throw _privateConstructorUsedError;
   String get startTime => throw _privateConstructorUsedError;
@@ -47,23 +47,21 @@ mixin _$LeaveRequestModel {
 /// @nodoc
 abstract class $LeaveRequestModelCopyWith<$Res> {
   factory $LeaveRequestModelCopyWith(
-    LeaveRequestModel value,
-    $Res Function(LeaveRequestModel) then,
-  ) = _$LeaveRequestModelCopyWithImpl<$Res, LeaveRequestModel>;
+          LeaveRequestModel value, $Res Function(LeaveRequestModel) then) =
+      _$LeaveRequestModelCopyWithImpl<$Res, LeaveRequestModel>;
   @useResult
-  $Res call({
-    String id,
-    String idUser,
-    String idManager,
-    String status,
-    DateTime startDate,
-    DateTime endDate,
-    String startTime,
-    String endTime,
-    String reason,
-    List<ActivityLogModel> activitiesLog,
-    DateTime createdAt,
-  });
+  $Res call(
+      {String id,
+      String idUser,
+      String idManager,
+      @RequestStatusConverter() RequestStatus status,
+      DateTime startDate,
+      DateTime endDate,
+      String startTime,
+      String endTime,
+      String reason,
+      List<ActivityLogModel> activitiesLog,
+      DateTime createdAt});
 }
 
 /// @nodoc
@@ -93,90 +91,84 @@ class _$LeaveRequestModelCopyWithImpl<$Res, $Val extends LeaveRequestModel>
     Object? activitiesLog = null,
     Object? createdAt = null,
   }) {
-    return _then(
-      _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
-                      as String,
-            idUser: null == idUser
-                ? _value.idUser
-                : idUser // ignore: cast_nullable_to_non_nullable
-                      as String,
-            idManager: null == idManager
-                ? _value.idManager
-                : idManager // ignore: cast_nullable_to_non_nullable
-                      as String,
-            status: null == status
-                ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as String,
-            startDate: null == startDate
-                ? _value.startDate
-                : startDate // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
-            endDate: null == endDate
-                ? _value.endDate
-                : endDate // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
-            startTime: null == startTime
-                ? _value.startTime
-                : startTime // ignore: cast_nullable_to_non_nullable
-                      as String,
-            endTime: null == endTime
-                ? _value.endTime
-                : endTime // ignore: cast_nullable_to_non_nullable
-                      as String,
-            reason: null == reason
-                ? _value.reason
-                : reason // ignore: cast_nullable_to_non_nullable
-                      as String,
-            activitiesLog: null == activitiesLog
-                ? _value.activitiesLog
-                : activitiesLog // ignore: cast_nullable_to_non_nullable
-                      as List<ActivityLogModel>,
-            createdAt: null == createdAt
-                ? _value.createdAt
-                : createdAt // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      idUser: null == idUser
+          ? _value.idUser
+          : idUser // ignore: cast_nullable_to_non_nullable
+              as String,
+      idManager: null == idManager
+          ? _value.idManager
+          : idManager // ignore: cast_nullable_to_non_nullable
+              as String,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as RequestStatus,
+      startDate: null == startDate
+          ? _value.startDate
+          : startDate // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      endDate: null == endDate
+          ? _value.endDate
+          : endDate // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      startTime: null == startTime
+          ? _value.startTime
+          : startTime // ignore: cast_nullable_to_non_nullable
+              as String,
+      endTime: null == endTime
+          ? _value.endTime
+          : endTime // ignore: cast_nullable_to_non_nullable
+              as String,
+      reason: null == reason
+          ? _value.reason
+          : reason // ignore: cast_nullable_to_non_nullable
+              as String,
+      activitiesLog: null == activitiesLog
+          ? _value.activitiesLog
+          : activitiesLog // ignore: cast_nullable_to_non_nullable
+              as List<ActivityLogModel>,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ) as $Val);
   }
 }
 
 /// @nodoc
 abstract class _$$LeaveRequestModelImplCopyWith<$Res>
     implements $LeaveRequestModelCopyWith<$Res> {
-  factory _$$LeaveRequestModelImplCopyWith(
-    _$LeaveRequestModelImpl value,
-    $Res Function(_$LeaveRequestModelImpl) then,
-  ) = __$$LeaveRequestModelImplCopyWithImpl<$Res>;
+  factory _$$LeaveRequestModelImplCopyWith(_$LeaveRequestModelImpl value,
+          $Res Function(_$LeaveRequestModelImpl) then) =
+      __$$LeaveRequestModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String id,
-    String idUser,
-    String idManager,
-    String status,
-    DateTime startDate,
-    DateTime endDate,
-    String startTime,
-    String endTime,
-    String reason,
-    List<ActivityLogModel> activitiesLog,
-    DateTime createdAt,
-  });
+  $Res call(
+      {String id,
+      String idUser,
+      String idManager,
+      @RequestStatusConverter() RequestStatus status,
+      DateTime startDate,
+      DateTime endDate,
+      String startTime,
+      String endTime,
+      String reason,
+      List<ActivityLogModel> activitiesLog,
+      DateTime createdAt});
 }
 
 /// @nodoc
 class __$$LeaveRequestModelImplCopyWithImpl<$Res>
     extends _$LeaveRequestModelCopyWithImpl<$Res, _$LeaveRequestModelImpl>
     implements _$$LeaveRequestModelImplCopyWith<$Res> {
-  __$$LeaveRequestModelImplCopyWithImpl(
-    _$LeaveRequestModelImpl _value,
-    $Res Function(_$LeaveRequestModelImpl) _then,
-  ) : super(_value, _then);
+  __$$LeaveRequestModelImplCopyWithImpl(_$LeaveRequestModelImpl _value,
+      $Res Function(_$LeaveRequestModelImpl) _then)
+      : super(_value, _then);
 
   /// Create a copy of LeaveRequestModel
   /// with the given fields replaced by the non-null parameter values.
@@ -195,73 +187,71 @@ class __$$LeaveRequestModelImplCopyWithImpl<$Res>
     Object? activitiesLog = null,
     Object? createdAt = null,
   }) {
-    return _then(
-      _$LeaveRequestModelImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as String,
-        idUser: null == idUser
-            ? _value.idUser
-            : idUser // ignore: cast_nullable_to_non_nullable
-                  as String,
-        idManager: null == idManager
-            ? _value.idManager
-            : idManager // ignore: cast_nullable_to_non_nullable
-                  as String,
-        status: null == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                  as String,
-        startDate: null == startDate
-            ? _value.startDate
-            : startDate // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
-        endDate: null == endDate
-            ? _value.endDate
-            : endDate // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
-        startTime: null == startTime
-            ? _value.startTime
-            : startTime // ignore: cast_nullable_to_non_nullable
-                  as String,
-        endTime: null == endTime
-            ? _value.endTime
-            : endTime // ignore: cast_nullable_to_non_nullable
-                  as String,
-        reason: null == reason
-            ? _value.reason
-            : reason // ignore: cast_nullable_to_non_nullable
-                  as String,
-        activitiesLog: null == activitiesLog
-            ? _value._activitiesLog
-            : activitiesLog // ignore: cast_nullable_to_non_nullable
-                  as List<ActivityLogModel>,
-        createdAt: null == createdAt
-            ? _value.createdAt
-            : createdAt // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
-      ),
-    );
+    return _then(_$LeaveRequestModelImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      idUser: null == idUser
+          ? _value.idUser
+          : idUser // ignore: cast_nullable_to_non_nullable
+              as String,
+      idManager: null == idManager
+          ? _value.idManager
+          : idManager // ignore: cast_nullable_to_non_nullable
+              as String,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as RequestStatus,
+      startDate: null == startDate
+          ? _value.startDate
+          : startDate // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      endDate: null == endDate
+          ? _value.endDate
+          : endDate // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      startTime: null == startTime
+          ? _value.startTime
+          : startTime // ignore: cast_nullable_to_non_nullable
+              as String,
+      endTime: null == endTime
+          ? _value.endTime
+          : endTime // ignore: cast_nullable_to_non_nullable
+              as String,
+      reason: null == reason
+          ? _value.reason
+          : reason // ignore: cast_nullable_to_non_nullable
+              as String,
+      activitiesLog: null == activitiesLog
+          ? _value._activitiesLog
+          : activitiesLog // ignore: cast_nullable_to_non_nullable
+              as List<ActivityLogModel>,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$LeaveRequestModelImpl implements _LeaveRequestModel {
-  const _$LeaveRequestModelImpl({
-    required this.id,
-    required this.idUser,
-    required this.idManager,
-    required this.status,
-    required this.startDate,
-    required this.endDate,
-    required this.startTime,
-    required this.endTime,
-    required this.reason,
-    required final List<ActivityLogModel> activitiesLog,
-    required this.createdAt,
-  }) : _activitiesLog = activitiesLog;
+  const _$LeaveRequestModelImpl(
+      {required this.id,
+      required this.idUser,
+      required this.idManager,
+      @RequestStatusConverter() required this.status,
+      required this.startDate,
+      required this.endDate,
+      required this.startTime,
+      required this.endTime,
+      required this.reason,
+      required final List<ActivityLogModel> activitiesLog,
+      required this.createdAt})
+      : _activitiesLog = activitiesLog;
 
   factory _$LeaveRequestModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$LeaveRequestModelImplFromJson(json);
@@ -273,7 +263,8 @@ class _$LeaveRequestModelImpl implements _LeaveRequestModel {
   @override
   final String idManager;
   @override
-  final String status;
+  @RequestStatusConverter()
+  final RequestStatus status;
   @override
   final DateTime startDate;
   @override
@@ -317,10 +308,8 @@ class _$LeaveRequestModelImpl implements _LeaveRequestModel {
                 other.startTime == startTime) &&
             (identical(other.endTime, endTime) || other.endTime == endTime) &&
             (identical(other.reason, reason) || other.reason == reason) &&
-            const DeepCollectionEquality().equals(
-              other._activitiesLog,
-              _activitiesLog,
-            ) &&
+            const DeepCollectionEquality()
+                .equals(other._activitiesLog, _activitiesLog) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
@@ -328,19 +317,18 @@ class _$LeaveRequestModelImpl implements _LeaveRequestModel {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    id,
-    idUser,
-    idManager,
-    status,
-    startDate,
-    endDate,
-    startTime,
-    endTime,
-    reason,
-    const DeepCollectionEquality().hash(_activitiesLog),
-    createdAt,
-  );
+      runtimeType,
+      id,
+      idUser,
+      idManager,
+      status,
+      startDate,
+      endDate,
+      startTime,
+      endTime,
+      reason,
+      const DeepCollectionEquality().hash(_activitiesLog),
+      createdAt);
 
   /// Create a copy of LeaveRequestModel
   /// with the given fields replaced by the non-null parameter values.
@@ -349,30 +337,29 @@ class _$LeaveRequestModelImpl implements _LeaveRequestModel {
   @pragma('vm:prefer-inline')
   _$$LeaveRequestModelImplCopyWith<_$LeaveRequestModelImpl> get copyWith =>
       __$$LeaveRequestModelImplCopyWithImpl<_$LeaveRequestModelImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$LeaveRequestModelImplToJson(this);
+    return _$$LeaveRequestModelImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _LeaveRequestModel implements LeaveRequestModel {
-  const factory _LeaveRequestModel({
-    required final String id,
-    required final String idUser,
-    required final String idManager,
-    required final String status,
-    required final DateTime startDate,
-    required final DateTime endDate,
-    required final String startTime,
-    required final String endTime,
-    required final String reason,
-    required final List<ActivityLogModel> activitiesLog,
-    required final DateTime createdAt,
-  }) = _$LeaveRequestModelImpl;
+  const factory _LeaveRequestModel(
+      {required final String id,
+      required final String idUser,
+      required final String idManager,
+      @RequestStatusConverter() required final RequestStatus status,
+      required final DateTime startDate,
+      required final DateTime endDate,
+      required final String startTime,
+      required final String endTime,
+      required final String reason,
+      required final List<ActivityLogModel> activitiesLog,
+      required final DateTime createdAt}) = _$LeaveRequestModelImpl;
 
   factory _LeaveRequestModel.fromJson(Map<String, dynamic> json) =
       _$LeaveRequestModelImpl.fromJson;
@@ -384,7 +371,8 @@ abstract class _LeaveRequestModel implements LeaveRequestModel {
   @override
   String get idManager;
   @override
-  String get status;
+  @RequestStatusConverter()
+  RequestStatus get status;
   @override
   DateTime get startDate;
   @override
@@ -434,18 +422,16 @@ mixin _$ActivityLogModel {
 /// @nodoc
 abstract class $ActivityLogModelCopyWith<$Res> {
   factory $ActivityLogModelCopyWith(
-    ActivityLogModel value,
-    $Res Function(ActivityLogModel) then,
-  ) = _$ActivityLogModelCopyWithImpl<$Res, ActivityLogModel>;
+          ActivityLogModel value, $Res Function(ActivityLogModel) then) =
+      _$ActivityLogModelCopyWithImpl<$Res, ActivityLogModel>;
   @useResult
-  $Res call({
-    String id,
-    String action,
-    String userId,
-    String userRole,
-    DateTime timestamp,
-    String? comment,
-  });
+  $Res call(
+      {String id,
+      String action,
+      String userId,
+      String userRole,
+      DateTime timestamp,
+      String? comment});
 }
 
 /// @nodoc
@@ -470,65 +456,59 @@ class _$ActivityLogModelCopyWithImpl<$Res, $Val extends ActivityLogModel>
     Object? timestamp = null,
     Object? comment = freezed,
   }) {
-    return _then(
-      _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
-                      as String,
-            action: null == action
-                ? _value.action
-                : action // ignore: cast_nullable_to_non_nullable
-                      as String,
-            userId: null == userId
-                ? _value.userId
-                : userId // ignore: cast_nullable_to_non_nullable
-                      as String,
-            userRole: null == userRole
-                ? _value.userRole
-                : userRole // ignore: cast_nullable_to_non_nullable
-                      as String,
-            timestamp: null == timestamp
-                ? _value.timestamp
-                : timestamp // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
-            comment: freezed == comment
-                ? _value.comment
-                : comment // ignore: cast_nullable_to_non_nullable
-                      as String?,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      action: null == action
+          ? _value.action
+          : action // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      userRole: null == userRole
+          ? _value.userRole
+          : userRole // ignore: cast_nullable_to_non_nullable
+              as String,
+      timestamp: null == timestamp
+          ? _value.timestamp
+          : timestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      comment: freezed == comment
+          ? _value.comment
+          : comment // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
   }
 }
 
 /// @nodoc
 abstract class _$$ActivityLogModelImplCopyWith<$Res>
     implements $ActivityLogModelCopyWith<$Res> {
-  factory _$$ActivityLogModelImplCopyWith(
-    _$ActivityLogModelImpl value,
-    $Res Function(_$ActivityLogModelImpl) then,
-  ) = __$$ActivityLogModelImplCopyWithImpl<$Res>;
+  factory _$$ActivityLogModelImplCopyWith(_$ActivityLogModelImpl value,
+          $Res Function(_$ActivityLogModelImpl) then) =
+      __$$ActivityLogModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String id,
-    String action,
-    String userId,
-    String userRole,
-    DateTime timestamp,
-    String? comment,
-  });
+  $Res call(
+      {String id,
+      String action,
+      String userId,
+      String userRole,
+      DateTime timestamp,
+      String? comment});
 }
 
 /// @nodoc
 class __$$ActivityLogModelImplCopyWithImpl<$Res>
     extends _$ActivityLogModelCopyWithImpl<$Res, _$ActivityLogModelImpl>
     implements _$$ActivityLogModelImplCopyWith<$Res> {
-  __$$ActivityLogModelImplCopyWithImpl(
-    _$ActivityLogModelImpl _value,
-    $Res Function(_$ActivityLogModelImpl) _then,
-  ) : super(_value, _then);
+  __$$ActivityLogModelImplCopyWithImpl(_$ActivityLogModelImpl _value,
+      $Res Function(_$ActivityLogModelImpl) _then)
+      : super(_value, _then);
 
   /// Create a copy of ActivityLogModel
   /// with the given fields replaced by the non-null parameter values.
@@ -542,48 +522,45 @@ class __$$ActivityLogModelImplCopyWithImpl<$Res>
     Object? timestamp = null,
     Object? comment = freezed,
   }) {
-    return _then(
-      _$ActivityLogModelImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as String,
-        action: null == action
-            ? _value.action
-            : action // ignore: cast_nullable_to_non_nullable
-                  as String,
-        userId: null == userId
-            ? _value.userId
-            : userId // ignore: cast_nullable_to_non_nullable
-                  as String,
-        userRole: null == userRole
-            ? _value.userRole
-            : userRole // ignore: cast_nullable_to_non_nullable
-                  as String,
-        timestamp: null == timestamp
-            ? _value.timestamp
-            : timestamp // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
-        comment: freezed == comment
-            ? _value.comment
-            : comment // ignore: cast_nullable_to_non_nullable
-                  as String?,
-      ),
-    );
+    return _then(_$ActivityLogModelImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      action: null == action
+          ? _value.action
+          : action // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      userRole: null == userRole
+          ? _value.userRole
+          : userRole // ignore: cast_nullable_to_non_nullable
+              as String,
+      timestamp: null == timestamp
+          ? _value.timestamp
+          : timestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      comment: freezed == comment
+          ? _value.comment
+          : comment // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$ActivityLogModelImpl implements _ActivityLogModel {
-  const _$ActivityLogModelImpl({
-    required this.id,
-    required this.action,
-    required this.userId,
-    required this.userRole,
-    required this.timestamp,
-    this.comment,
-  });
+  const _$ActivityLogModelImpl(
+      {required this.id,
+      required this.action,
+      required this.userId,
+      required this.userRole,
+      required this.timestamp,
+      this.comment});
 
   factory _$ActivityLogModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$ActivityLogModelImplFromJson(json);
@@ -624,14 +601,7 @@ class _$ActivityLogModelImpl implements _ActivityLogModel {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    id,
-    action,
-    userId,
-    userRole,
-    timestamp,
-    comment,
-  );
+      runtimeType, id, action, userId, userRole, timestamp, comment);
 
   /// Create a copy of ActivityLogModel
   /// with the given fields replaced by the non-null parameter values.
@@ -640,25 +610,24 @@ class _$ActivityLogModelImpl implements _ActivityLogModel {
   @pragma('vm:prefer-inline')
   _$$ActivityLogModelImplCopyWith<_$ActivityLogModelImpl> get copyWith =>
       __$$ActivityLogModelImplCopyWithImpl<_$ActivityLogModelImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ActivityLogModelImplToJson(this);
+    return _$$ActivityLogModelImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ActivityLogModel implements ActivityLogModel {
-  const factory _ActivityLogModel({
-    required final String id,
-    required final String action,
-    required final String userId,
-    required final String userRole,
-    required final DateTime timestamp,
-    final String? comment,
-  }) = _$ActivityLogModelImpl;
+  const factory _ActivityLogModel(
+      {required final String id,
+      required final String action,
+      required final String userId,
+      required final String userRole,
+      required final DateTime timestamp,
+      final String? comment}) = _$ActivityLogModelImpl;
 
   factory _ActivityLogModel.fromJson(Map<String, dynamic> json) =
       _$ActivityLogModelImpl.fromJson;

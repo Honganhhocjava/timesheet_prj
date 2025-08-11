@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 
 class WorkLogEntity {
   final String id;
   final String idUser;
   final String idManager;
-  final WorkLogStatus status;
+  final RequestStatus status;
   final DateTime workDate;
   final TimeOfDay checkInTime;
   final TimeOfDay checkOutTime;
@@ -29,7 +30,7 @@ class WorkLogEntity {
     String? id,
     String? idUser,
     String? idManager,
-    WorkLogStatus? status,
+    RequestStatus? status,
     DateTime? workDate,
     TimeOfDay? checkInTime,
     TimeOfDay? checkOutTime,
@@ -51,8 +52,6 @@ class WorkLogEntity {
     );
   }
 }
-
-enum WorkLogStatus { pending, approved, rejected, cancelled }
 
 class ActivityLog {
   final String id;

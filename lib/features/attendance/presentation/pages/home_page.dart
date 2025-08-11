@@ -1049,7 +1049,7 @@ class _RequestOption extends StatelessWidget {
                     color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child:image,
+                  child: image,
                 ),
                 const SizedBox(width: 16),
                 Expanded(

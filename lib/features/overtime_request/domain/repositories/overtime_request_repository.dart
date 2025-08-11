@@ -1,5 +1,6 @@
 import 'package:timesheet_project/features/overtime_request/domain/entities/overtime_request_entity.dart';
 import 'package:timesheet_project/features/user/domain/entities/user_entity.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 
 abstract class OvertimeRequestRepository {
   Future<void> createOvertimeRequest(OvertimeRequestEntity overtimeRequest);
@@ -11,7 +12,7 @@ abstract class OvertimeRequestRepository {
   Future<List<UserEntity>> getManagers();
   Future<void> updateOvertimeRequestStatus(
     String id,
-    OvertimeRequestStatus status,
+    RequestStatus status,
     String? comment,
   );
   Future<void> updateOvertimeRequest(OvertimeRequestEntity overtimeRequest);

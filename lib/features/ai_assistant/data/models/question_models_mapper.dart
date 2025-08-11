@@ -3,18 +3,18 @@ import 'package:timesheet_project/features/ai_assistant/domain/entities/question
 
 extension QuestionModelX on QuestionModel {
   Question toEntity() => Question(
-    id: id,
-    question: question,
-    options: options,
-    answer: answer,
-  );
+        id: id,
+        question: question,
+        options: options,
+        answer: answer,
+      );
 }
 
 extension QuestionX on Question {
   QuestionModel toModel() => QuestionModel(
-    id: id,
-    question: question,
-    options: options,
-    answer: answer,
-  );
+        id: id,
+        question: question,
+        options: options,
+        answer: answer,
+      );
 }

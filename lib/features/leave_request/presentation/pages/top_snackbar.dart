@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class TopSnackbar {
   static void show(BuildContext context, String message,
       {Color backgroundColor = Colors.red,
-        Duration duration = const Duration(seconds: 2)}) {
+      Duration duration = const Duration(seconds: 2)}) {
     final overlay = Overlay.of(context);
     final overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
@@ -29,9 +29,10 @@ class TopSnackbar {
 
     Future.delayed(duration).then((_) => overlayEntry.remove());
   }
+
   static void showGreen(BuildContext context, String message,
       {Color backgroundColor = Colors.green,
-        Duration duration = const Duration(seconds: 2)}) {
+      Duration duration = const Duration(seconds: 2)}) {
     final overlay = Overlay.of(context);
     final overlayEntry = OverlayEntry(
       builder: (context) => Positioned(

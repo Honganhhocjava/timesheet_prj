@@ -1,6 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/material.dart';
 import 'package:timesheet_project/features/attendance_adjustment/domain/entities/attendance_adjustment_entity.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
+import 'package:timesheet_project/core/converters/request_converters.dart';
 
 part 'attendance_adjustment_model.freezed.dart';
 part 'attendance_adjustment_model.g.dart';
@@ -11,7 +13,7 @@ class AttendanceAdjustmentModel with _$AttendanceAdjustmentModel {
     required String id,
     required String idUser,
     required String idManager,
-    required String status,
+    @RequestStatusConverter() required RequestStatus status,
     required DateTime adjustmentDate,
     required String originalCheckIn,
     required String originalCheckOut,
@@ -32,7 +34,7 @@ extension AttendanceAdjustmentModelX on AttendanceAdjustmentModel {
       id: id,
       idUser: idUser,
       idManager: idManager,
-      status: _stringToStatus(status),
+      status: status,
       adjustmentDate: adjustmentDate,
       originalCheckIn: _stringToTimeOfDay(originalCheckIn),
       originalCheckOut: _stringToTimeOfDay(originalCheckOut),
@@ -51,7 +53,7 @@ extension AttendanceAdjustmentModelX on AttendanceAdjustmentModel {
       id: entity.id,
       idUser: entity.idUser,
       idManager: entity.idManager,
-      status: _statusToString(entity.status),
+      status: entity.status,
       adjustmentDate: entity.adjustmentDate,
       originalCheckIn: _timeOfDayToString(entity.originalCheckIn),
       originalCheckOut: _timeOfDayToString(entity.originalCheckOut),
@@ -74,32 +76,12 @@ extension AttendanceAdjustmentModelX on AttendanceAdjustmentModel {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
-  static AttendanceAdjustmentStatus _stringToStatus(String status) {
-    switch (status) {
-      case 'pending':
-        return AttendanceAdjustmentStatus.pending;
-      case 'approved':
-        return AttendanceAdjustmentStatus.approved;
-      case 'rejected':
-        return AttendanceAdjustmentStatus.rejected;
-      case 'cancelled':
-        return AttendanceAdjustmentStatus.cancelled;
-      default:
-        return AttendanceAdjustmentStatus.pending;
-    }
+  static RequestStatus _stringToStatus(String status) {
+    return status.toRequestStatus();
   }
 
-  static String _statusToString(AttendanceAdjustmentStatus status) {
-    switch (status) {
-      case AttendanceAdjustmentStatus.pending:
-        return 'pending';
-      case AttendanceAdjustmentStatus.approved:
-        return 'approved';
-      case AttendanceAdjustmentStatus.rejected:
-        return 'rejected';
-      case AttendanceAdjustmentStatus.cancelled:
-        return 'cancelled';
-    }
+  static String _statusToString(RequestStatus status) {
+    return status.toStringValue();
   }
 }
 

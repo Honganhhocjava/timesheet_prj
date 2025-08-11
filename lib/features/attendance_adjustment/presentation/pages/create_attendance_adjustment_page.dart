@@ -34,34 +34,31 @@ class CreateAttendanceAdjustmentPage extends StatelessWidget {
         ),
         body:
             BlocListener<AttendanceAdjustmentCubit, AttendanceAdjustmentState>(
-              listener: (context, state) {
-                if (state is AttendanceAdjustmentCreated) {
-                  TopSnackbar.showGreen(context, state.message);
-                  Navigator.pop(context);
-                } else if (state is AttendanceAdjustmentError) {
-                  TopSnackbar.show(context, state.message);
-                }
-              },
-              child:
-                  BlocBuilder<
-                    AttendanceAdjustmentCubit,
-                    AttendanceAdjustmentState
-                  >(
-                    builder: (context, state) {
-                      if (state is AttendanceAdjustmentFormState) {
-                        return _buildForm(context, state);
-                      } else if (state is AttendanceAdjustmentInitial ||
-                          state is AttendanceAdjustmentLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: Color(0xFF0A357D),
-                          ),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
+          listener: (context, state) {
+            if (state is AttendanceAdjustmentCreated) {
+              TopSnackbar.showGreen(context, state.message);
+              Navigator.pop(context);
+            } else if (state is AttendanceAdjustmentError) {
+              TopSnackbar.show(context, state.message);
+            }
+          },
+          child:
+              BlocBuilder<AttendanceAdjustmentCubit, AttendanceAdjustmentState>(
+            builder: (context, state) {
+              if (state is AttendanceAdjustmentFormState) {
+                return _buildForm(context, state);
+              } else if (state is AttendanceAdjustmentInitial ||
+                  state is AttendanceAdjustmentLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xFF0A357D),
                   ),
-            ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
       ),
     );
   }
@@ -205,8 +202,8 @@ class CreateAttendanceAdjustmentPage extends StatelessWidget {
               onPressed: state.isLoading
                   ? null
                   : () => context
-                        .read<AttendanceAdjustmentCubit>()
-                        .submitAttendanceAdjustment(),
+                      .read<AttendanceAdjustmentCubit>()
+                      .submitAttendanceAdjustment(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0A357D),
                 shape: RoundedRectangleBorder(
@@ -426,8 +423,8 @@ class CreateAttendanceAdjustmentPage extends StatelessWidget {
             onChanged: (UserEntity? manager) {
               if (manager != null) {
                 context.read<AttendanceAdjustmentCubit>().selectManager(
-                  manager,
-                );
+                      manager,
+                    );
               }
             },
             icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),

@@ -10,9 +10,8 @@ _$QuestionModelImpl _$$QuestionModelImplFromJson(Map<String, dynamic> json) =>
     _$QuestionModelImpl(
       id: json['id'] as String,
       question: json['question'] as String,
-      options: (json['options'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
+      options:
+          (json['options'] as List<dynamic>).map((e) => e as String).toList(),
       answer: json['answer'] as String,
     );
 

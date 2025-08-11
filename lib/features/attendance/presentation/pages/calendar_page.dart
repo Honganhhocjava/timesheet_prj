@@ -9,7 +9,7 @@ import 'package:timesheet_project/features/attendance/presentation/cubit/calenda
 import 'package:timesheet_project/di/di.dart';
 import 'package:timesheet_project/features/user/domain/repositories/user_repository.dart';
 
-enum RequestStatus { approved, sent, rejected }
+import 'package:timesheet_project/core/enums/request_enums.dart';
 
 class LeaveRequest {
   final DateTime date;
@@ -105,9 +105,9 @@ class _TimesheetCalendarPageBodyState
   RequestStatus _mapStatus(dynamic status) {
     final s = (status ?? '').toString().toLowerCase();
     if (s == 'approved') return RequestStatus.approved;
-    if (s == 'sent' || s == 'pending') return RequestStatus.sent;
+    if (s == 'sent' || s == 'pending') return RequestStatus.pending;
     if (s == 'rejected' || s == 'cancelled') return RequestStatus.rejected;
-    return RequestStatus.sent;
+    return RequestStatus.pending;
   }
 
   @override
@@ -187,9 +187,6 @@ class _TimesheetCalendarPageBodyState
                         ),
                       ),
                       TableCalendar(
-
-
-
                         availableGestures: AvailableGestures.none,
                         headerVisible: false,
                         locale: 'vi_VN',
@@ -259,16 +256,16 @@ class _TimesheetCalendarPageBodyState
                                 status = 'rejected';
                               } else if (dayRequests.leaveRequests.any((e) =>
                                       _mapStatus(e['status']) ==
-                                      RequestStatus.sent) ||
+                                      RequestStatus.pending) ||
                                   dayRequests.overtimeRequests.any((e) =>
                                       _mapStatus(e['status']) ==
-                                      RequestStatus.sent) ||
+                                      RequestStatus.pending) ||
                                   dayRequests.attendanceAdjustments.any((e) =>
                                       _mapStatus(e['status']) ==
-                                      RequestStatus.sent) ||
+                                      RequestStatus.pending) ||
                                   dayRequests.workLogs.any((e) =>
                                       _mapStatus(e['status']) ==
-                                      RequestStatus.sent)) {
+                                      RequestStatus.pending)) {
                                 status = 'pending';
                               } else if (dayRequests.leaveRequests.isNotEmpty ||
                                   dayRequests.overtimeRequests.isNotEmpty ||
@@ -302,8 +299,7 @@ class _TimesheetCalendarPageBodyState
                               child: Text(
                                 '${day.day}',
                                 style: const TextStyle(
-                                  color: Color(0xFF4481C6)
-                                ,
+                                  color: Color(0xFF4481C6),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -330,16 +326,16 @@ class _TimesheetCalendarPageBodyState
                                 status = 'rejected';
                               } else if (dayRequests.leaveRequests.any((e) =>
                                       _mapStatus(e['status']) ==
-                                      RequestStatus.sent) ||
+                                      RequestStatus.pending) ||
                                   dayRequests.overtimeRequests.any((e) =>
                                       _mapStatus(e['status']) ==
-                                      RequestStatus.sent) ||
+                                      RequestStatus.pending) ||
                                   dayRequests.attendanceAdjustments.any((e) =>
                                       _mapStatus(e['status']) ==
-                                      RequestStatus.sent) ||
+                                      RequestStatus.pending) ||
                                   dayRequests.workLogs.any((e) =>
                                       _mapStatus(e['status']) ==
-                                      RequestStatus.sent)) {
+                                      RequestStatus.pending)) {
                                 status = 'pending';
                               } else if (dayRequests.leaveRequests.isNotEmpty ||
                                   dayRequests.overtimeRequests.isNotEmpty ||
@@ -398,7 +394,7 @@ class _TimesheetCalendarPageBodyState
                           ],
                         )
                       else
-                         Padding(
+                        Padding(
                           padding: EdgeInsets.only(top: 24),
                           child: Center(
                             child: Column(
@@ -408,14 +404,16 @@ class _TimesheetCalendarPageBodyState
                                   width: 60,
                                   height: 60,
                                 ),
-                                SizedBox(height: 10,),
-                                const Text( // <- Text có thể là const nếu không thay đổi
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                const Text(
+                                  // <- Text có thể là const nếu không thay đổi
                                   'Nhấn vào ngày để xem chi tiết',
                                   style: TextStyle(fontSize: 24),
                                 ),
                               ],
                             ),
-
                           ),
                         ),
                     ],
@@ -450,6 +448,7 @@ class _RequestListTileVN extends StatelessWidget {
     final user = await repo.getUserData(userId);
     return user?.avatarUrl;
   }
+
   Future<String> _getName(String userId) async {
     final repo = getIt<UserRepository>();
     final user = await repo.getUserData(userId);
@@ -460,12 +459,12 @@ class _RequestListTileVN extends StatelessWidget {
     final lastName = user.lastName ?? '';
     return '$firstName $lastName'.trim();
   }
-  String getCurrentUserId(){
+
+  String getCurrentUserId() {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) throw Exception('Người dùng chưa đăng nhập');
     return user.uid;
   }
-
 
   @override
   // Widget build(BuildContext context) {
@@ -605,7 +604,7 @@ class _RequestListTileVN extends StatelessWidget {
     return FutureBuilder<List<dynamic>>(
       future: Future.wait([
         _getAvatarUrl(userId),
-       // _getName(userId),
+        // _getName(userId),
       ]),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
@@ -652,7 +651,7 @@ class _RequestListTileVN extends StatelessWidget {
                         ),
                         TextSpan(
                           text:
-                          ' vào ${_weekdayVN(date.weekday)}, ngày ${_formatDate(date)}',
+                              ' vào ${_weekdayVN(date.weekday)}, ngày ${_formatDate(date)}',
                           style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
                       ],
@@ -666,8 +665,8 @@ class _RequestListTileVN extends StatelessWidget {
                         request['note'] ??
                         request['notes'] ??
                         '',
-                    style: const TextStyle(
-                        fontSize: 15, color: Color(0xFF111827)),
+                    style:
+                        const TextStyle(fontSize: 15, color: Color(0xFF111827)),
                   ),
                   Row(
                     children: [
@@ -706,7 +705,8 @@ class _RequestListTileVN extends StatelessWidget {
                                   color: Color(0xFF6B7280),
                                   fontWeight: FontWeight.w500)),
                           Text(_formatTime(request['checkInTime']),
-                              style: const TextStyle(fontWeight: FontWeight.bold)),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
                           const SizedBox(width: 16),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -737,7 +737,6 @@ class _RequestListTileVN extends StatelessWidget {
       },
     );
   }
-
 
   String _getRequestTypeVN(String type) {
     switch (type) {
@@ -804,6 +803,5 @@ class _RequestListTileVN extends StatelessWidget {
       default:
         return 'chờ duyệt';
     }
-
   }
 }

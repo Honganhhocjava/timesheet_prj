@@ -7,13 +7,14 @@ import 'package:timesheet_project/features/work_log/domain/usecases/create_work_
 import 'package:timesheet_project/features/work_log/domain/usecases/get_managers_usecase.dart';
 import 'package:timesheet_project/features/work_log/presentation/cubit/work_log_state.dart';
 import 'package:timesheet_project/features/user/domain/entities/user_entity.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 
 class WorkLogCubit extends Cubit<WorkLogState> {
   final CreateWorkLogUsecase createWorkLogUsecase;
   final GetManagersUsecase getManagersUsecase;
 
   WorkLogCubit(this.createWorkLogUsecase, this.getManagersUsecase)
-    : super(WorkLogInitial());
+      : super(WorkLogInitial());
 
   Future<void> initializeForm() async {
     emit(WorkLogLoading());
@@ -94,11 +95,9 @@ class WorkLogCubit extends Cubit<WorkLogState> {
 
     // Check if check-in time is before check-out time
     if (currentState.checkInTime != null && currentState.checkOutTime != null) {
-      final checkInMinutes =
-          currentState.checkInTime!.hour * 60 +
+      final checkInMinutes = currentState.checkInTime!.hour * 60 +
           currentState.checkInTime!.minute;
-      final checkOutMinutes =
-          currentState.checkOutTime!.hour * 60 +
+      final checkOutMinutes = currentState.checkOutTime!.hour * 60 +
           currentState.checkOutTime!.minute;
 
       if (checkInMinutes >= checkOutMinutes) {
@@ -133,7 +132,7 @@ class WorkLogCubit extends Cubit<WorkLogState> {
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         idUser: user.uid,
         idManager: currentState.selectedManager!.uid,
-        status: WorkLogStatus.pending,
+        status: RequestStatus.pending,
         workDate: currentState.workDate!,
         checkInTime: currentState.checkInTime!,
         checkOutTime: currentState.checkOutTime!,

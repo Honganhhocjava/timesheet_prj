@@ -4,6 +4,7 @@ import 'package:timesheet_project/core/usecases/usecase.dart';
 import 'package:timesheet_project/features/leave_request/domain/entities/leave_request_entity.dart';
 import 'package:timesheet_project/features/leave_request/domain/repositories/leave_request_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
 
 class CreateLeaveRequestUsecase
     implements UseCase<void, CreateLeaveRequestParams> {
@@ -31,7 +32,7 @@ class CreateLeaveRequestUsecase
       id: params.id,
       idUser: currentUser.uid,
       idManager: params.idManager,
-      status: LeaveRequestStatus.pending,
+      status: RequestStatus.pending,
       startDate: params.startDate,
       endDate: params.endDate,
       startTime: params.startTime,

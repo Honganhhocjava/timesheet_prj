@@ -17,5 +17,4 @@ abstract class QuestionModel with _$QuestionModel {
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) =>
       _$QuestionModelFromJson(json);
-
 }

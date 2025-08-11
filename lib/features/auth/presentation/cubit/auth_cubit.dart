@@ -35,7 +35,8 @@ class AuthCubit extends Cubit<AuthState> {
       if (user != null) {
         emit(AuthSuccess(user));
       } else {
-        emit(AuthError('Đăng nhập thất bại. Vui lòng kiểm tra kết nối đường truyền.'));
+        emit(AuthError(
+            'Đăng nhập thất bại. Vui lòng kiểm tra kết nối đường truyền.'));
       }
     } catch (e) {
       emit(AuthError('Lỗi: $e'));

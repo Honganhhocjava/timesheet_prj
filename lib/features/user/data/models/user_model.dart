@@ -23,7 +23,6 @@ class UserModel with _$UserModel {
       _$UserModelFromJson(json);
 }
 
-
 class TimestampConverter implements JsonConverter<DateTime, Timestamp> {
   const TimestampConverter();
 

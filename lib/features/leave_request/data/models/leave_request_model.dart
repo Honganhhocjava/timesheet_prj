@@ -1,6 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/material.dart';
 import 'package:timesheet_project/features/leave_request/domain/entities/leave_request_entity.dart';
+import 'package:timesheet_project/core/enums/request_enums.dart';
+import 'package:timesheet_project/core/converters/request_converters.dart';
 
 part 'leave_request_model.freezed.dart';
 part 'leave_request_model.g.dart';
@@ -11,7 +13,7 @@ class LeaveRequestModel with _$LeaveRequestModel {
     required String id,
     required String idUser,
     required String idManager,
-    required String status,
+    @RequestStatusConverter() required RequestStatus status,
     required DateTime startDate,
     required DateTime endDate,
     required String startTime,
@@ -31,7 +33,7 @@ extension LeaveRequestModelX on LeaveRequestModel {
       id: id,
       idUser: idUser,
       idManager: idManager,
-      status: _stringToStatus(status),
+      status: status,
       startDate: startDate,
       endDate: endDate,
       startTime: _stringToTimeOfDay(startTime),
@@ -47,7 +49,7 @@ extension LeaveRequestModelX on LeaveRequestModel {
       id: entity.id,
       idUser: entity.idUser,
       idManager: entity.idManager,
-      status: _statusToString(entity.status),
+      status: entity.status,
       startDate: entity.startDate,
       endDate: entity.endDate,
       startTime: _timeOfDayToString(entity.startTime),
@@ -69,35 +71,15 @@ extension LeaveRequestModelX on LeaveRequestModel {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
-  static LeaveRequestStatus _stringToStatus(String status) {
-    switch (status) {
-      case 'pending':
-        return LeaveRequestStatus.pending;
-      case 'approved':
-        return LeaveRequestStatus.approved;
-      case 'rejected':
-        return LeaveRequestStatus.rejected;
-      case 'cancelled':
-        return LeaveRequestStatus.cancelled;
-      default:
-        return LeaveRequestStatus.pending;
-    }
+  static RequestStatus _stringToStatus(String status) {
+    return status.toRequestStatus();
   }
 
-  static String _statusToString(LeaveRequestStatus status) {
-    switch (status) {
-      case LeaveRequestStatus.pending:
-        return 'pending';
-      case LeaveRequestStatus.approved:
-        return 'approved';
-      case LeaveRequestStatus.rejected:
-        return 'rejected';
-      case LeaveRequestStatus.cancelled:
-        return 'cancelled';
-    }
+  static String _statusToString(RequestStatus status) {
+    return status.toStringValue();
   }
 
-  static String statusToString(LeaveRequestStatus status) {
+  static String statusToString(RequestStatus status) {
     return _statusToString(status);
   }
 }

@@ -132,8 +132,8 @@ class _EditLeaveRequestPageState extends State<EditLeaveRequestPage> {
               onPressed: state.isLoading
                   ? null
                   : () => context.read<LeaveRequestCubit>().updateLeaveRequest(
-                      widget.request,
-                    ),
+                        widget.request,
+                      ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0A357D),
                 foregroundColor: Colors.white,
@@ -282,9 +282,8 @@ class _EditLeaveRequestPageState extends State<EditLeaveRequestPage> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: state.reasonError != null
-                  ? Colors.red
-                  : Colors.grey.shade300,
+              color:
+                  state.reasonError != null ? Colors.red : Colors.grey.shade300,
             ),
           ),
           child: TextFormField(

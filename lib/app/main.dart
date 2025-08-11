@@ -15,7 +15,6 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-
   await setupDependencyInjection();
   await initializeDateFormatting('vi_VN', '');
 
@@ -27,7 +26,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  MultiBlocProvider(
+    return MultiBlocProvider(
       providers: [
         BlocProvider<AuthCubit>(create: (context) => getIt<AuthCubit>()),
         BlocProvider<UserCubit>(create: (context) => getIt<UserCubit>()),

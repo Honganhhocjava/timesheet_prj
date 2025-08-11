@@ -3,12 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:timesheet_project/features/ai_assistant/domain/entities/question.dart';
 import 'package:timesheet_project/features/ai_assistant/pages/survey/survey_cubit.dart';
 
-
 class QuestionCard extends StatefulWidget {
   final Question question;
   final int index;
   final String? selectedAnswer;
-
 
   const QuestionCard({
     super.key,
@@ -60,12 +58,11 @@ class _QuestionCardState extends State<QuestionCard> {
           ),
           const SizedBox(height: 12),
           ...widget.question.options.map(
-                (option) => RadioListTile<String>(
+            (option) => RadioListTile<String>(
               title: Text(option),
               value: option,
               activeColor: Color(0xFF003E83),
               groupValue: selectedOption,
-
               onChanged: (value) {
                 setState(() => selectedOption = value);
                 if (value != null) {
@@ -80,4 +77,3 @@ class _QuestionCardState extends State<QuestionCard> {
     );
   }
 }
-

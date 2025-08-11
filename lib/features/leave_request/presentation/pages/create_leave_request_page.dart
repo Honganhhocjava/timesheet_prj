@@ -174,7 +174,7 @@ class CreateLeaveRequestPage extends StatelessWidget {
               onPressed: state.isLoading
                   ? null
                   : () =>
-                        context.read<LeaveRequestCubit>().submitLeaveRequest(),
+                      context.read<LeaveRequestCubit>().submitLeaveRequest(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0A357D),
                 shape: RoundedRectangleBorder(
